@@ -1,0 +1,23 @@
+{
+  "name": "satzio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SATZIO – Trainieren. Abhaken. Stärker werden.",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter ./packages/** --filter ./apps/api --filter ./apps/web run build",
+    "build:shared": "pnpm --filter @satzio/shared build",
+    "dev:api": "pnpm --filter @satzio/api dev",
+    "dev:web": "pnpm --filter @satzio/web dev",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r --filter ./packages/** --filter ./apps/api --filter ./apps/web run test",
+    "test:unit": "pnpm --filter @satzio/shared test && pnpm --filter @satzio/web test",
+    "test:api": "pnpm --filter @satzio/api test",
+    "test:e2e": "pnpm --filter @satzio/e2e test"
+  }
+}
