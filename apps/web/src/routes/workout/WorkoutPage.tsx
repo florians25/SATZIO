@@ -23,6 +23,8 @@ import { ExerciseBlock } from './ExerciseBlock';
 import { ExerciseSheet } from './ExerciseSheet';
 import { FinishSheet } from './FinishSheet';
 import { GuidedView } from './GuidedView';
+import { Keypad, KeypadSpacer } from './Keypad';
+import { useKeypad } from './keypad-store';
 import { RestTimerBar } from './RestTimerBar';
 import { SetSheet } from './SetSheet';
 import { TextInputSheet } from './TextInputSheet';
@@ -161,6 +163,7 @@ export default function WorkoutPage() {
             ariaLabel="Ansicht"
             value={mode}
             onChange={(m) => {
+              useKeypad.getState().close();
               setMode(m);
               updateSettings.mutate({ workoutMode: m });
             }}
@@ -190,7 +193,6 @@ export default function WorkoutPage() {
                   key={exId}
                   exId={exId}
                   unit={settings.unit}
-                  stepsKg={settings.weightStepsKg}
                   performance={exerciseId ? performance.get(exerciseId) : undefined}
                   imageUrl={exerciseId ? exerciseMap.get(exerciseId)?.imageUrl : null}
                   progressionEnabled={settings.progressionEnabled}
@@ -217,7 +219,17 @@ export default function WorkoutPage() {
             )}
           </div>
         )}
+        <KeypadSpacer />
       </div>
+
+      <Keypad
+        unit={settings.unit}
+        stepsKg={settings.weightStepsKg}
+        haptics={settings.vibrationEnabled}
+        performance={performance}
+        exerciseMap={exerciseMap}
+        onToggle={toggle}
+      />
 
       {!completed && (
         <div className="fixed inset-x-0 bottom-0 z-30 pb-safe">

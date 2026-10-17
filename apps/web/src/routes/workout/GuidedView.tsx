@@ -8,6 +8,7 @@ import { Sheet, SheetAction } from '@/components/ui/sheet';
 import { cn } from '@/lib/cn';
 import { fmtWeight } from '@/lib/format';
 import { useWorkout } from '@/lib/workout';
+import { useKeypad } from './keypad-store';
 import { NumberField } from './NumberField';
 import { fromKgDisplay, quickSteps } from './units';
 
@@ -44,7 +45,22 @@ export function GuidedView({
   const sIdx = setIndex ?? (autoSet >= 0 ? autoSet : Math.max(0, (ex?.sets.length ?? 1) - 1));
   const set = ex?.sets[sIdx];
 
-  useEffect(() => setSetIndex(null), [exIndex]);
+  const goEx = (i: number) => {
+    setExIndex(i);
+    setSetIndex(null);
+  };
+
+  // Zahlentastatur springt zu einem anderen Satz (Weiter / Satz fertig) → mitgehen
+  const kpActive = useKeypad((s) => s.active);
+  useEffect(() => {
+    if (!kpActive) return;
+    const ei = exercises.findIndex((e) => e.id === kpActive.exId);
+    if (ei < 0) return;
+    const si = exercises[ei].sets.findIndex((x) => x.id === kpActive.setId);
+    if (ei !== exIndex) setExIndex(ei);
+    if (si >= 0) setSetIndex(si);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kpActive]);
 
   const all = session.exercises.flatMap((e) => e.sets);
   const done = all.filter((s) => s.completed).length;
@@ -62,12 +78,17 @@ export function GuidedView({
   const next = exercises.slice(exIndex + 1).find((e) => e.sets.some((s) => !s.completed)) ?? exercises.find((e, i) => i !== exIndex && e.sets.some((s) => !s.completed));
   const item = ex.exerciseId ? exerciseMap.get(ex.exerciseId) : undefined;
 
+  // aktuellen Stand aus dem Store lesen (eine laufende Eingabe wurde beim Blur gerade gespeichert)
+  const fresh = () => (set ? useWorkout.getState().session?.exercises.find((e) => e.id === ex.id)?.sets.find((x) => x.id === set.id) : undefined);
   const changeWeight = (deltaDisplay: number) => {
-    if (!set) return;
-    const cur = set.weightKg ?? 0;
-    updateSet(ex.id, set.id, { weightKg: Math.max(0, Math.round((cur + toKg(deltaDisplay, unit)) * 1000) / 1000) });
+    const cur = fresh();
+    if (!cur) return;
+    updateSet(ex.id, cur.id, { weightKg: Math.max(0, Math.round(((cur.weightKg ?? 0) + toKg(deltaDisplay, unit)) * 1000) / 1000) });
   };
-  const changeReps = (d: number) => set && updateSet(ex.id, set.id, { reps: Math.max(0, (set.reps ?? 0) + d) });
+  const changeReps = (d: number) => {
+    const cur = fresh();
+    if (cur) updateSet(ex.id, cur.id, { reps: Math.max(0, (cur.reps ?? 0) + d) });
+  };
 
   return (
     <div className="space-y-4 px-4 pb-6">
@@ -132,6 +153,8 @@ export function GuidedView({
                   onCommit={(v) => updateSet(ex.id, set.id, { weightKg: v === null ? null : toKg(v, unit) })}
                   ariaLabel={`Gewicht in ${unit}`}
                   className="h-16 w-full text-4xl font-extrabold"
+                  max={unit === 'kg' ? 1000 : 2200}
+                  kp={{ exId: ex.id, setId: set.id, field: 'weight' }}
                 />
               }
             />
@@ -147,6 +170,8 @@ export function GuidedView({
                   onCommit={(v) => updateSet(ex.id, set.id, { reps: v })}
                   ariaLabel="Wiederholungen"
                   className="h-16 w-full text-4xl font-extrabold"
+                  max={500}
+                  kp={{ exId: ex.id, setId: set.id, field: 'reps' }}
                 />
               }
             />
@@ -167,20 +192,20 @@ export function GuidedView({
       ) : (
         exDone &&
         next && (
-          <Button size="lg" block variant="secondary" onClick={() => setExIndex(exercises.indexOf(next))}>
+          <Button size="lg" block variant="secondary" onClick={() => goEx(exercises.indexOf(next))}>
             Nächste Übung: {next.name} <ChevronRight className="h-5 w-5" />
           </Button>
         )
       )}
 
       <div className="grid grid-cols-3 gap-2">
-        <Button variant="ghost" disabled={exIndex === 0} onClick={() => setExIndex((i) => Math.max(0, i - 1))}>
+        <Button variant="ghost" disabled={exIndex === 0} onClick={() => goEx(Math.max(0, exIndex - 1))}>
           <ChevronLeft className="h-5 w-5" /> Zurück
         </Button>
         <Button variant="ghost" onClick={() => setListOpen(true)}>
           <List className="h-5 w-5" /> Übungen
         </Button>
-        <Button variant="ghost" disabled={exIndex >= exercises.length - 1} onClick={() => setExIndex((i) => Math.min(exercises.length - 1, i + 1))}>
+        <Button variant="ghost" disabled={exIndex >= exercises.length - 1} onClick={() => goEx(Math.min(exercises.length - 1, exIndex + 1))}>
           <SkipForward className="h-5 w-5" /> Weiter
         </Button>
       </div>
@@ -194,7 +219,7 @@ export function GuidedView({
               icon={d === e.sets.length && e.sets.length ? <Check className="text-primary" /> : <span className="text-sm font-bold">{i + 1}</span>}
               hint={`${d}/${e.sets.length} Sätze`}
               onClick={() => {
-                setExIndex(i);
+                goEx(i);
                 setListOpen(false);
               }}
             >

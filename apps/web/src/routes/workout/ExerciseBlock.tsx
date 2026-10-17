@@ -7,12 +7,10 @@ import { cn } from '@/lib/cn';
 import { fmtWeight } from '@/lib/format';
 import { useWorkout } from '@/lib/workout';
 import { SetRow } from './SetRow';
-import { quickSteps } from './units';
 
 export const ExerciseBlock = memo(function ExerciseBlock({
   exId,
   unit,
-  stepsKg,
   performance,
   imageUrl,
   progressionEnabled,
@@ -22,7 +20,6 @@ export const ExerciseBlock = memo(function ExerciseBlock({
 }: {
   exId: string;
   unit: WeightUnit;
-  stepsKg: number[];
   performance: ExercisePerformance | undefined;
   imageUrl: string | null | undefined;
   progressionEnabled: boolean;
@@ -57,7 +54,6 @@ export const ExerciseBlock = memo(function ExerciseBlock({
   if (!meta) return null;
   const setIds = meta.setIds ? meta.setIds.split(',') : [];
   const allDone = setIds.length > 0 && meta.doneCount === setIds.length;
-  const steps = quickSteps(stepsKg, meta.weightStepKg, unit);
 
   const suggestion =
     progressionEnabled && meta.status !== 'completed' && performance && meta.targetMax !== null
@@ -111,7 +107,7 @@ export const ExerciseBlock = memo(function ExerciseBlock({
       {suggestion?.type === 'hold' && <p className="mx-3 mb-1 rounded-xl bg-surface-2 px-3 py-2 text-xs text-muted">{suggestion.reason}</p>}
       <div className="px-1">
         {setIds.map((id, i) => (
-          <SetRow key={id} exId={exId} setId={id} index={i} unit={unit} steps={steps} onToggle={onToggle} onMenu={onSetMenu} />
+          <SetRow key={id} exId={exId} setId={id} index={i} unit={unit} onToggle={onToggle} onMenu={onSetMenu} />
         ))}
       </div>
       <button
