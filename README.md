@@ -33,6 +33,8 @@ git clone <repo-url> satzio && cd satzio
 docker compose up -d --build  # baut und startet Datenbank, API und Web-App
 ```
 
+**Update später:** `./scripts/update.sh` (Backup → neuer Stand → Neubau → Neustart → Healthcheck).
+
 | Adresse | |
 |---|---|
 | **http://localhost:8080/** | Produktwebsite |

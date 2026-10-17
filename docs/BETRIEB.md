@@ -101,13 +101,15 @@ Stoppt API/Web, spielt den Dump mit `pg_restore --clean` ein, stellt optional Up
 
 ## 7. Updates
 
+Ein Befehl:
+
 ```bash
-git pull
-./scripts/backup.sh
-docker compose up -d --build
+./scripts/update.sh
 ```
 
-Migrationen werden beim Start der API reproduzierbar angewendet (`prisma migrate deploy`). Clients erhalten neue Versionen über den Service Worker mit Hinweis „Neue Version verfügbar“ – es gibt **keinen automatischen Reload mitten im Training**. Lokale, noch nicht synchronisierte Änderungen bleiben in IndexedDB erhalten (Dexie-Schemaversionierung).
+Das Skript erstellt ein Backup, holt den neuen Stand (`git pull --ff-only`), baut die Images neu, startet die Container, wartet auf den Healthcheck und räumt alte Images auf. Optionen: `--no-backup`, `--no-pull`, `--branch NAME`. Schlägt der Start fehl, zeigt es die Logs und den Befehl zum Zurückwechseln auf die vorherige Version.
+
+Migrationen werden beim Start der API reproduzierbar angewendet (`prisma migrate deploy`). Clients erhalten neue Versionen über den Service Worker mit Hinweis „Neue Version verfügbar“ – es gibt **keinen automatischen Reload mitten im Training**. Lokale, noch nicht synchronisierte Änderungen bleiben in IndexedDB erhalten.
 
 ## 8. Monitoring & Logs
 
