@@ -9,7 +9,7 @@ import {
   type UserExerciseSettingsInput,
 } from '@satzio/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Camera, ImageOff, ListPlus, Pencil, ShieldAlert, Star, Trash2 } from 'lucide-react';
+import { AlertTriangle, Camera, ImageOff, Pencil, Plus, ShieldAlert, Star, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
@@ -126,7 +126,7 @@ export default function ExerciseDetailPage() {
 
         <div className="grid grid-cols-2 gap-2">
           <Button variant="secondary" onClick={() => setAddToPlan(true)}>
-            <ListPlus className="h-4 w-4" /> Zu Plan hinzufügen
+            <Plus className="h-4 w-4" /> Zu Plan hinzufügen
           </Button>
           <Button variant="secondary" onClick={() => fileRef.current?.click()}>
             <Camera className="h-4 w-4" /> Eigenes Bild

@@ -1,68 +1,97 @@
 import type { MuscleGroup } from '@satzio/shared';
-import { memo } from 'react';
+import { memo, useId } from 'react';
 import { cn } from '@/lib/cn';
+import { BACK, FRONT, SILHOUETTE, type MusclePath } from './muscle-paths';
 
 /**
- * Eigene, schematische Körpergrafik (Vorder- & Rückseite) – hebt die
- * trainierten Muskelgruppen hervor. Keine fremden Bildrechte.
- * Dient als neutrale Übungsillustration, solange kein eigenes Bild existiert.
+ * Anatomische Muskelkarte (Vorder- & Rückseite) – eigene Zeichnung, keine
+ * fremden Bildrechte. Hebt die trainierten Muskelgruppen hervor und dient als
+ * Übungsillustration, solange kein eigenes Foto existiert.
  */
-type Region = { id: string; muscle: MuscleGroup; d: string };
 
-const FRONT: Region[] = [
-  { id: 'f-chest-l', muscle: 'chest', d: 'M31 33c4-3 9-3 13-1v9c-4 2-9 2-13-1z' },
-  { id: 'f-chest-r', muscle: 'chest', d: 'M57 33c-4-3-9-3-13-1v9c4 2 9 2 13-1z' },
-  { id: 'f-sh-l', muscle: 'shoulders', d: 'M24 32c2-4 5-5 8-5l-1 9c-3 0-6 1-7 3z' },
-  { id: 'f-sh-r', muscle: 'shoulders', d: 'M64 32c-2-4-5-5-8-5l1 9c3 0 6 1 7 3z' },
-  { id: 'f-bi-l', muscle: 'biceps', d: 'M23 40c2-2 5-3 7-2l-1 11c-2 1-5 0-7-1z' },
-  { id: 'f-bi-r', muscle: 'biceps', d: 'M65 40c-2-2-5-3-7-2l1 11c2 1 5 0 7-1z' },
-  { id: 'f-fa-l', muscle: 'forearms', d: 'M21 51c2 0 5 1 7 0l-2 13c-2 0-4 0-6-1z' },
-  { id: 'f-fa-r', muscle: 'forearms', d: 'M67 51c-2 0-5 1-7 0l2 13c2 0 4 0 6-1z' },
-  { id: 'f-abs', muscle: 'abs', d: 'M38 43h12v19c-4 2-8 2-12 0z' },
-  { id: 'f-core-l', muscle: 'core', d: 'M32 44l5-1v19l-5-3z' },
-  { id: 'f-core-r', muscle: 'core', d: 'M56 44l-5-1v19l5-3z' },
-  { id: 'f-q-l', muscle: 'quads', d: 'M33 66c3-1 7-1 10 1l-1 20c-3 1-6 1-8 0z' },
-  { id: 'f-q-r', muscle: 'quads', d: 'M55 66c-3-1-7-1-10 1l1 20c3 1 6 1 8 0z' },
-  { id: 'f-c-l', muscle: 'calves', d: 'M34 91h7l-1 15h-5z' },
-  { id: 'f-c-r', muscle: 'calves', d: 'M54 91h-7l1 15h5z' },
+const ALL_GROUPS: MuscleGroup[] = [
+  'chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms', 'abs', 'core', 'quads', 'hamstrings', 'glutes', 'calves',
 ];
+const BACK_GROUPS: MuscleGroup[] = ['back', 'triceps', 'glutes', 'hamstrings'];
+const FRONT_GROUPS: MuscleGroup[] = ['chest', 'abs', 'quads', 'biceps'];
+const LOWER_GROUPS: MuscleGroup[] = ['quads', 'hamstrings', 'glutes', 'calves'];
 
-const BACK: Region[] = [
-  { id: 'b-tr', muscle: 'back', d: 'M36 28h16l-2 6H38z' },
-  { id: 'b-lat-l', muscle: 'back', d: 'M31 35l12-1v16l-9 4z' },
-  { id: 'b-lat-r', muscle: 'back', d: 'M57 35l-12-1v16l9 4z' },
-  { id: 'b-low', muscle: 'core', d: 'M38 51h12v9H38z' },
-  { id: 'b-sh-l', muscle: 'shoulders', d: 'M24 32c2-4 5-5 8-5l-1 9c-3 0-6 1-7 3z' },
-  { id: 'b-sh-r', muscle: 'shoulders', d: 'M64 32c-2-4-5-5-8-5l1 9c3 0 6 1 7 3z' },
-  { id: 'b-tri-l', muscle: 'triceps', d: 'M23 40c2-2 5-3 7-2l-1 11c-2 1-5 0-7-1z' },
-  { id: 'b-tri-r', muscle: 'triceps', d: 'M65 40c-2-2-5-3-7-2l1 11c2 1 5 0 7-1z' },
-  { id: 'b-fa-l', muscle: 'forearms', d: 'M21 51c2 0 5 1 7 0l-2 13c-2 0-4 0-6-1z' },
-  { id: 'b-fa-r', muscle: 'forearms', d: 'M67 51c-2 0-5 1-7 0l2 13c2 0 4 0 6-1z' },
-  { id: 'b-gl-l', muscle: 'glutes', d: 'M33 61c3-1 7-1 10 1v8c-3 1-7 1-10-1z' },
-  { id: 'b-gl-r', muscle: 'glutes', d: 'M55 61c-3-1-7-1-10 1v8c3 1 7 1 10-1z' },
-  { id: 'b-h-l', muscle: 'hamstrings', d: 'M33 72c3 1 7 1 10 0l-1 15c-3 1-6 1-8 0z' },
-  { id: 'b-h-r', muscle: 'hamstrings', d: 'M55 72c-3 1-7 1-10 0l1 15c3 1 6 1 8 0z' },
-  { id: 'b-c-l', muscle: 'calves', d: 'M34 91h7l-1 15h-5z' },
-  { id: 'b-c-r', muscle: 'calves', d: 'M54 91h-7l1 15h5z' },
-];
+const BODY = 'color-mix(in srgb, var(--text) 5%, var(--surface-3))';
+const INACTIVE = 'color-mix(in srgb, var(--text) 15%, var(--surface-3))';
+// deckend gemischt, damit überlappende Muskelkanten nicht durchscheinen
+const SECONDARY = 'color-mix(in srgb, var(--primary) 45%, var(--surface-3))';
 
-const SILHOUETTE =
-  'M44 6c5 0 8 4 8 9s-3 9-8 9-8-4-8-9 3-9 8-9zM30 26h28c5 0 9 3 10 8l4 20-2 12h-5l-3-13-1 9v4l3 22-2 24h-8l-3-22-2-14h-2l-2 14-3 22h-8l-2-24 3-22v-4l-1-9-3 13h-5l-2-12 4-20c1-5 5-8 10-8z';
+function toSet(list: readonly (MuscleGroup | null | undefined)[]): Set<MuscleGroup> {
+  const set = new Set<MuscleGroup>();
+  for (const m of list) if (m) set.add(m);
+  if (set.has('full_body')) ALL_GROUPS.forEach((m) => set.add(m));
+  return set;
+}
 
-function Body({ regions, primary, secondary }: { regions: Region[]; primary: Set<MuscleGroup>; secondary: Set<MuscleGroup> }) {
+function Figure({
+  muscles,
+  primary,
+  secondary,
+  uid,
+  x = 0,
+}: {
+  muscles: MusclePath[];
+  primary: Set<MuscleGroup>;
+  secondary: Set<MuscleGroup>;
+  uid: string;
+  x?: number;
+}) {
   return (
-    <>
-      <path d={SILHOUETTE} fill="var(--surface-3)" />
-      {regions.map((r) => (
-        <path
-          key={r.id}
-          d={r.d}
-          fill={primary.has(r.muscle) ? 'var(--primary)' : secondary.has(r.muscle) ? 'color-mix(in srgb, var(--primary) 40%, transparent)' : 'var(--surface-2)'}
-          stroke="var(--bg)"
-          strokeWidth="0.6"
-        />
-      ))}
-    </>
+    <g transform={x ? `translate(${x} 0)` : undefined}>
+      <g fill={BODY}>
+        {SILHOUETTE.map((d, i) => (
+          <path key={i} d={d} />
+        ))}
+      </g>
+      <g stroke="var(--bg)" strokeWidth="0.42" strokeLinejoin="round">
+        {muscles.map((m, i) => (
+          <path
+            key={i}
+            d={m.d}
+            fill={!m.muscle ? INACTIVE : primary.has(m.muscle) ? `url(#${uid}-p)` : secondary.has(m.muscle) ? SECONDARY : INACTIVE}
+          />
+        ))}
+      </g>
+      {/* Muskelvolumen: Licht oben links, Schatten zum Rand */}
+      <g fill={`url(#${uid}-vol)`} style={{ pointerEvents: 'none' }}>
+        {muscles.map((m, i) => (
+          <path key={i} d={m.d} />
+        ))}
+      </g>
+      {/* weiche Volumen-Schattierung über der ganzen Figur */}
+      <g fill={`url(#${uid}-shade)`} style={{ pointerEvents: 'none' }}>
+        {SILHOUETTE.map((d, i) => (
+          <path key={i} d={d} />
+        ))}
+      </g>
+    </g>
+  );
+}
+
+function Defs({ uid }: { uid: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${uid}-p`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style={{ stopColor: 'color-mix(in srgb, var(--primary) 88%, #fff)' }} />
+        <stop offset="1" style={{ stopColor: 'color-mix(in srgb, var(--primary) 82%, #000)' }} />
+      </linearGradient>
+      <radialGradient id={`${uid}-vol`} cx="0.42" cy="0.36" r="0.78">
+        <stop offset="0" style={{ stopColor: '#fff', stopOpacity: 0.12 }} />
+        <stop offset="0.5" style={{ stopColor: '#fff', stopOpacity: 0 }} />
+        <stop offset="1" style={{ stopColor: '#000', stopOpacity: 0.22 }} />
+      </radialGradient>
+      <linearGradient id={`${uid}-shade`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="scale(100 1)">
+        <stop offset="0" style={{ stopColor: '#000', stopOpacity: 0.16 }} />
+        <stop offset="0.3" style={{ stopColor: '#000', stopOpacity: 0 }} />
+        <stop offset="0.7" style={{ stopColor: '#000', stopOpacity: 0 }} />
+        <stop offset="1" style={{ stopColor: '#000', stopOpacity: 0.16 }} />
+      </linearGradient>
+    </defs>
   );
 }
 
@@ -77,27 +106,31 @@ export const MuscleMap = memo(function MuscleMap({
   className?: string;
   compact?: boolean;
 }) {
-  const p = new Set<MuscleGroup>(Array.isArray(primary) ? primary : primary ? [primary] : []);
-  if (p.has('full_body')) ['chest', 'back', 'shoulders', 'quads', 'glutes', 'hamstrings', 'core', 'abs'].forEach((m) => p.add(m as MuscleGroup));
-  const s = new Set<MuscleGroup>(secondary);
-  const backOnly: MuscleGroup[] = ['back', 'triceps', 'glutes', 'hamstrings'];
-  const frontOnly: MuscleGroup[] = ['chest', 'abs', 'quads', 'biceps'];
-  const prim = [...p];
-  // Kompakt: nur die Körperseite mit dem Hauptmuskel, formatfüllend
-  const compactSide: 'front' | 'back' = prim.some((m) => frontOnly.includes(m)) || !prim.some((m) => backOnly.includes(m)) ? 'front' : 'back';
+  const uid = 'mm' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const primList = Array.isArray(primary) ? primary : primary ? [primary] : [];
+  const p = toSet(primList);
+  const s = toSet(secondary);
+  const label = 'Anatomische Darstellung der beanspruchten Muskulatur';
+
   if (compact) {
+    // Kompakt: nur die Körperseite mit dem Hauptmuskel, Ausschnitt formatfüllend
+    const side: 'front' | 'back' =
+      primList.some((m) => FRONT_GROUPS.includes(m)) || !primList.some((m) => BACK_GROUPS.includes(m)) ? 'front' : 'back';
+    const full = primList.length === 0 || primList.includes('full_body');
+    const lower = !full && primList.every((m) => LOWER_GROUPS.includes(m));
+    const viewBox = full ? '6 1 88 208' : lower ? '21 100 58 108' : '9 20 82 92';
     return (
-      <svg viewBox="16 3 56 106" className={cn('h-full w-full', className)} role="img" aria-label="Schematische Darstellung der beanspruchten Muskulatur (Platzhaltergrafik)">
-        <Body regions={compactSide === 'front' ? FRONT : BACK} primary={p} secondary={s} />
+      <svg viewBox={viewBox} className={cn('h-full w-full', className)} role="img" aria-label={label}>
+        <Defs uid={uid} />
+        <Figure muscles={side === 'front' ? FRONT : BACK} primary={p} secondary={s} uid={uid} />
       </svg>
     );
   }
   return (
-    <svg viewBox="0 0 176 112" className={cn('h-full w-full', className)} role="img" aria-label="Schematische Darstellung der beanspruchten Muskulatur (Platzhaltergrafik)">
-      <Body regions={FRONT} primary={p} secondary={s} />
-      <g transform="translate(88 0)">
-        <Body regions={BACK} primary={p} secondary={s} />
-      </g>
+    <svg viewBox="4 0 196 210" className={cn('h-full w-full', className)} role="img" aria-label={`${label} (Vorder- und Rückseite)`}>
+      <Defs uid={uid} />
+      <Figure muscles={FRONT} primary={p} secondary={s} uid={uid} />
+      <Figure muscles={BACK} primary={p} secondary={s} uid={uid} x={104} />
     </svg>
   );
 });

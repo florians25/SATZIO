@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datenschutz – SATZIO</title>
+  <meta name="robots" content="noindex">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="index.html" aria-label="SATZIO Startseite">
+      <img src="favicon.svg" width="22" height="22" alt="">
+      <span>SATZIO</span>
+    </a>
+    <a class="btn btn-primary btn-sm" href="/app/" data-app-link>Web-App öffnen</a>
+  </div>
+</header>
+
+<main id="main" class="legal">
+  <div class="wrap">
+    <h1>Datenschutzerklärung</h1>
+    <p class="template-note"><strong>Vorlage – vom Betreiber auszufüllen.</strong>
+      Platzhalter ersetzen, an die tatsächliche Konfiguration (Hoster, Logs, E-Mail-Versand) anpassen und rechtlich prüfen lassen. Diese Vorlage ist keine Rechtsberatung.</p>
+
+    <h2>1. Verantwortlicher</h2>
+    <p><span class="ph">[Name / Firma, Anschrift, E-Mail]</span></p>
+
+    <h2>2. Diese Website</h2>
+    <p>Diese Produktseite ist eine statische Website. Sie lädt keine externen Schriftarten, Skripte, Tracker oder Analysewerkzeuge und setzt keine Cookies.</p>
+    <p>Beim Aufruf verarbeitet der Webserver technisch notwendige Daten (IP-Adresse, Zeitpunkt, angefragte Datei, User-Agent) in Server-Logfiles.
+      Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO. Speicherdauer: <span class="ph">[z. B. 7 Tage]</span>.
+      Hoster: <span class="ph">[Name und Sitz des Hosters, ggf. Auftragsverarbeitungsvertrag]</span>.</p>
+
+    <h2>3. Die Web-App SATZIO</h2>
+    <p>Bei Nutzung der Web-App werden folgende Daten auf dem Server dieser Instanz gespeichert:</p>
+    <ul>
+      <li>Kontodaten: E-Mail-Adresse, Benutzername, Passwort-Hash (Argon2id), Profilangaben aus dem Onboarding</li>
+      <li>Trainingsdaten: Trainingspläne, Workouts, Sätze, Notizen, eigene Übungen</li>
+      <li>Optional: Körpergewicht und Körpermaße</li>
+      <li>Sitzungsdaten: Refresh-Token (HttpOnly-Cookie), CSRF-Cookie</li>
+    </ul>
+    <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung des Dienstes).
+      Angaben zu Körpergewicht und -maßen können Gesundheitsdaten im Sinne von Art. 9 DSGVO sein; ihre Erfassung ist freiwillig
+      <span class="ph">[Rechtsgrundlage/Einwilligung durch Betreiber prüfen]</span>.</p>
+    <p>Für den Offline-Betrieb speichert die App Daten zusätzlich lokal im Browser (IndexedDB) bzw. auf dem Gerät. Es werden keine Daten an Dritte oder an KI-Dienste übertragen; der Notizen-Import arbeitet lokal.</p>
+
+    <h2>4. Cookies</h2>
+    <p>Die Web-App verwendet ausschließlich technisch notwendige Cookies für die Anmeldung und den CSRF-Schutz (§ 25 Abs. 2 Nr. 2 TDDDG). Tracking-Cookies werden nicht eingesetzt.</p>
+
+    <h2>5. E-Mail-Versand</h2>
+    <p><span class="ph">[falls konfiguriert: SMTP-Anbieter für z. B. Passwort-Zurücksetzen nennen; sonst Abschnitt entfernen]</span></p>
+
+    <h2>6. Speicherdauer und Löschung</h2>
+    <p>Daten werden gespeichert, solange das Konto besteht. Das Konto lässt sich in der App unter Profil vollständig löschen; dabei werden alle zugehörigen Daten entfernt. Ein Export als JSON oder CSV ist jederzeit möglich.</p>
+
+    <h2>7. Deine Rechte</h2>
+    <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO) sowie das Recht auf Beschwerde bei einer Aufsichtsbehörde: <span class="ph">[zuständige Landesdatenschutzbehörde]</span>.</p>
+
+    <p style="margin-top:40px"><a href="index.html">← Zur Startseite</a></p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span class="wordmark wordmark-sm">SATZIO</span>
+    <nav aria-label="Rechtliches" class="footer-nav">
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html" aria-current="page">Datenschutz</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

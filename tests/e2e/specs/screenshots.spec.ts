@@ -8,9 +8,16 @@ const out = (n: string) => `../../docs/screenshots/${n}.png`;
 
 test('Screenshots der Kernbildschirme', async ({ page }) => {
   await page.goto('/');
+  await expect(page.getByText('Dein nächstes Level beginnt hier.')).toBeVisible();
   await page.screenshot({ path: out('01-willkommen') });
   const user = uniqueUser('shot');
   await register(page, user);
+  // Sauberer Anzeigename für die Doku-Screenshots
+  await page.evaluate(async () => {
+    const r = await fetch('/api/v1/auth/refresh', { method: 'POST', headers: { 'X-CSRF-Token': decodeURIComponent(document.cookie.match(/satzio_csrf=([^;]+)/)![1]) } });
+    const { accessToken } = await r.json();
+    await fetch('/api/v1/users/me/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ displayName: 'Florian' }) });
+  });
   await page.screenshot({ path: out('02-onboarding') });
   await onboarding(page, 'template');
   await page.getByRole('button', { name: /Push \/ Pull \/ Legs/ }).click();
@@ -44,5 +51,9 @@ test('Screenshots der Kernbildschirme', async ({ page }) => {
   await page.waitForTimeout(500);
   await page.screenshot({ path: out('08-fortschritt') });
   await page.goto('/exercises');
+  await expect(page.getByText('Bankdrücken').first()).toBeVisible();
   await page.screenshot({ path: out('09-uebungen') });
+  await page.getByText('Bankdrücken').first().click();
+  await expect(page.getByText('Ausführung')).toBeVisible();
+  await page.screenshot({ path: out('10-uebung-detail') });
 });

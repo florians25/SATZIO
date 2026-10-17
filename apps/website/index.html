@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SATZIO – Trainieren. Abhaken. Stärker werden.</title>
+  <meta name="description" content="SATZIO ist ein selbst gehostetes Trainingstagebuch: Sätze wie in einer Notiz abhaken, Trainingsnotizen lokal importieren, offline trainieren, Daten auf dem eigenen Server.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0B0F0E" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F6F8F6" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="wordmark" href="#top" aria-label="SATZIO Startseite">
+      <img src="favicon.svg" width="22" height="22" alt="">
+      <span>SATZIO</span>
+    </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      <a href="#funktionen">Funktionen</a>
+      <a href="#offline">Offline</a>
+      <a href="#self-hosting">Self-Hosting</a>
+      <a href="#technik">Technik</a>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="/app/" data-app-link>Web-App öffnen</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow mono">Trainingstagebuch · selbst gehostet · offline-fähig</p>
+        <h1 id="hero-title">Trainieren statt&nbsp;Tippen.</h1>
+        <p class="lede">
+          SATZIO protokolliert Krafttraining so knapp wie eine Notiz:
+          <span class="mono nowrap">60 kg × 12</span>, abhaken, weiter.
+          Werte vom letzten Mal sind vorausgefüllt, das Training läuft auch ohne Netz,
+          und alle Daten liegen auf deinem eigenen Server.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/app/" data-app-link>Web-App öffnen</a>
+          <a class="btn btn-ghost" href="#self-hosting">Selbst hosten <span aria-hidden="true">→</span></a>
+        </div>
+        <dl class="hero-facts">
+          <div><dt>Lizenzkosten</dt><dd>keine Cloud-Abos, keine bezahlten APIs</dd></div>
+          <div><dt>Deployment</dt><dd class="mono">docker compose up -d --build</dd></div>
+          <div><dt>Plattformen</dt><dd>Web (PWA), Android, iOS via Capacitor</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero-visual">
+        <figure class="notes-card" aria-label="Beispiel: Workout als Notiz">
+          <div class="notes-head">
+            <span class="notes-title">PUSH DAY</span>
+            <span class="notes-meta mono">Mo · 3/5</span>
+          </div>
+          <p class="notes-ex">Bankdrücken</p>
+          <ul class="notes-sets mono">
+            <li class="done"><span class="ck" aria-label="erledigt"></span><span class="w">40 kg</span><span class="x">×</span><span class="r">10</span><span class="tag">W</span></li>
+            <li class="done"><span class="ck" aria-label="erledigt"></span><span class="w">60 kg</span><span class="x">×</span><span class="r">12</span></li>
+            <li class="done"><span class="ck" aria-label="erledigt"></span><span class="w">70 kg</span><span class="x">×</span><span class="r">10</span></li>
+            <li class="open"><span class="ck" aria-label="offen"></span><span class="w">72,5 kg</span><span class="x">×</span><span class="r">8</span><span class="hint">zuletzt</span></li>
+          </ul>
+          <p class="notes-ex">Schrägbankdrücken KH</p>
+          <ul class="notes-sets mono">
+            <li class="open"><span class="ck" aria-label="offen"></span><span class="w">26 kg</span><span class="x">×</span><span class="r">10</span><span class="hint">zuletzt</span></li>
+            <li class="open"><span class="ck" aria-label="offen"></span><span class="w muted">— kg</span><span class="x">×</span><span class="r">8</span><span class="hint">Plan</span></li>
+          </ul>
+          <figcaption class="notes-foot mono">lokal · 2 Ops in Outbox</figcaption>
+        </figure>
+
+        <figure class="phone">
+          <div class="phone-screen">
+            <img src="assets/04-workout-liste.webp" width="540" height="1099"
+                 alt="SATZIO-App, Workout in der Listenansicht: Bankdrücken mit drei abgehakten Sätzen (40 kg × 10, 60 kg × 12, 70 kg × 10), darunter offene Sätze und ein laufender Pausentimer 2:31.">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parser -->
+  <section class="section" id="import" aria-labelledby="import-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker mono"><span>01</span> Notizen-Import</p>
+        <h2 id="import-title">Alte Trainingsnotizen übernehmen, <span class="nowrap">ohne KI-Cloud.</span></h2>
+        <p class="section-sub">
+          Text aus Apple Notizen, Google Keep oder einer beliebigen Textdatei einfügen.
+          Ein lokaler, regelbasierter Parser erkennt Übungen, Sätze, Wiederholungen und Gewichte.
+          Der Text verlässt dafür nicht das Gerät. Gewichte werden nie erfunden, und Mehrdeutiges wird markiert statt geraten.
+        </p>
+      </header>
+
+      <div class="parser">
+        <div class="pane">
+          <div class="pane-bar"><span class="mono">notizen.txt</span><span class="mono dim">Eingabe</span></div>
+<pre class="code"><code><span class="ln">1</span><span class="hl-day">Montag Push</span>
+<span class="ln">2</span>Bankdrücken 3x10 80kg
+<span class="ln">3</span>Latziehen 12x55, 10x60, 8x65
+<span class="ln">4</span>Bizeps 3 Sätze je 12 mit 14kg
+<span class="ln">5</span>Dips +10kg 3x8
+<span class="ln">6</span>Schrägbank 24x12, 26x10, 26x8</code></pre>
+        </div>
+
+        <div class="pane">
+          <div class="pane-bar"><span class="mono">parseWorkoutNotes()</span><span class="mono dim">Ergebnis</span></div>
+          <div class="table-scroll">
+            <table class="parsed">
+              <caption class="sr-only">Vom Parser erkannte Übungen und Sätze</caption>
+              <thead>
+                <tr><th scope="col">Zeile</th><th scope="col">Übung (Bibliothek)</th><th scope="col">Sätze</th><th scope="col">Status</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="mono dim">2</td><td>Bankdrücken</td><td class="mono">3 × 10 @ 80 kg</td><td><span class="pill ok">erkannt</span></td></tr>
+                <tr><td class="mono dim">3</td><td>Latziehen</td><td class="mono">55×12 · 60×10 · 65×8</td><td><span class="pill ok">erkannt</span></td></tr>
+                <tr><td class="mono dim">4</td><td>Bizepscurls Kurzhantel <span class="from">aus „Bizeps“</span></td><td class="mono">3 × 12 @ 14 kg</td><td><span class="pill ok">erkannt</span></td></tr>
+                <tr><td class="mono dim">5</td><td>Dips</td><td class="mono">3 × 8 @ +10 kg</td><td><span class="pill ok">erkannt</span></td></tr>
+                <tr class="flag"><td class="mono dim">6</td><td>Schrägbankdrücken Kurzhanteln <span class="from">aus „Schrägbank“</span></td><td class="mono">12×24 · 10×26 · 8×26</td><td><span class="pill warn">prüfen</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="pane-note">
+            <span class="mono warn-ink">Zeile 6:</span> „Gewicht und Wiederholungen sind nicht eindeutig – bitte die Reihenfolge prüfen.“
+            In der Vorschau tauscht ein Tipp auf <em>Gewicht/Wdh. tauschen</em> die Werte, bevor etwas gespeichert wird.
+          </p>
+        </div>
+      </div>
+      <p class="footnote">Ausgabe des tatsächlichen Parsers aus <span class="mono">packages/shared</span> für die gezeigte Eingabe. Ebenfalls unterstützt: Blockformat mit einer Übung pro Zeile und Sätzen darunter, Häkchen <span class="mono">✓</span>/<span class="mono">☐</span>, Wiederholungsbereiche wie <span class="mono">4x8-10</span>.</p>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="funktionen" aria-labelledby="features-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker mono"><span>02</span> Funktionen</p>
+        <h2 id="features-title">Was die App konkret macht.</h2>
+      </header>
+
+      <dl class="features">
+        <div class="feature">
+          <dt>Notiz-Editor fürs Workout</dt>
+          <dd>Jeder Satz ist eine Zeile <span class="mono">60 kg × 12 ✓</span>. Gewicht und Wiederholungen sind direkt in der Zeile editierbar, abgehakt wird mit einem Tipp. Sätze hinzufügen oder duplizieren, Aufwärmsätze markieren. Gespeichert wird automatisch, einen Speichern-Knopf gibt es nicht.</dd>
+        </div>
+        <div class="feature">
+          <dt>Smart Defaults</dt>
+          <dd>Vorausgefüllt werden die echten Werte vom letzten Training, je Satzposition und Satztyp, sonst Planvorgabe oder dein Standardwert. Für jeden Wert wird die Quelle gespeichert (<span class="mono">history</span>, <span class="mono">plan</span>, <span class="mono">user_default</span>, <span class="mono">none</span>). Fehlt eine Quelle, bleibt das Feld leer.</dd>
+        </div>
+        <div class="feature">
+          <dt>Geführter Modus &amp; Pausentimer</dt>
+          <dd>Ein Satz pro Bildschirm mit großen Bedienelementen. Der Pausentimer rechnet mit einer absoluten Endzeit und läuft deshalb nach Reload oder App-Wechsel korrekt weiter. Einschränkung: Hintergrund-Timer und Benachrichtigungen sind auf iOS nur begrenzt verfügbar.</dd>
+        </div>
+        <div class="feature">
+          <dt>Trainingspläne</dt>
+          <dd>Plan-Editor mit Autosave und Versionsverlauf. 11 Vorlagen (u. a. Ganzkörper, Push/Pull/Legs, Oberkörper/Unterkörper, Kurzhanteltraining) mit Satz- und Wiederholungszielen, ohne erfundene Gewichte. Flexible Rotation oder feste Wochentage; verpasste Einheiten lassen sich verschieben.</dd>
+        </div>
+        <div class="feature">
+          <dt>Übungsbibliothek</dt>
+          <dd>184 Übungen mit deutschen Ausführungshinweisen, Muskelgruppen und Equipment. Eigene Übungen lassen sich ergänzen und werden beim Import mit berücksichtigt.</dd>
+        </div>
+        <div class="feature">
+          <dt>Rekorde &amp; Progression</dt>
+          <dd>Persönliche Bestwerte pro Übung. Das 1RM wird nach Epley geschätzt und als Schätzung gekennzeichnet. Progressionsvorschläge erscheinen als Vorschlag. Übernommen wird erst, wenn du bestätigst.</dd>
+        </div>
+        <div class="feature">
+          <dt>Auswertung</dt>
+          <dd>Verlauf, Kalender, Volumen und Rekorde je Übung und Muskelgruppe, ausschließlich aus deinen erfassten Trainings. Körpergewicht und Maße separat. Ohne Daten bleibt ein Diagramm leer, statt Beispielwerte zu zeigen.</dd>
+        </div>
+        <div class="feature">
+          <dt>Erfolge &amp; Serien</dt>
+          <dd>Trainingsserien und Erfolge als leise Rückmeldung. Wer das nicht möchte, schaltet Erfolge im Profil komplett ab.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Offline -->
+  <section class="section" id="offline" aria-labelledby="offline-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker mono"><span>03</span> Offline &amp; Sync</p>
+        <h2 id="offline-title">Funkloch im Keller? Das Training läuft weiter.</h2>
+        <p class="section-sub">
+          Jede Änderung wird zuerst lokal geschrieben und als Operation in eine Outbox gelegt.
+          Sobald eine Verbindung besteht, werden die Operationen in Reihenfolge an den Server gesendet.
+        </p>
+      </header>
+
+      <ol class="flow" aria-label="Datenfluss bei der Synchronisation">
+        <li class="node">
+          <span class="node-k mono">Client</span>
+          <strong>App</strong>
+          <span class="node-d">React, Service Worker cacht die App-Shell</span>
+        </li>
+        <li class="node">
+          <span class="node-k mono">IndexedDB</span>
+          <strong>Outbox (Dexie)</strong>
+          <span class="node-d">Operation mit eindeutiger <span class="mono">opId</span> und <span class="mono">baseVersion</span></span>
+        </li>
+        <li class="node node-accent">
+          <span class="node-k mono">HTTP</span>
+          <strong class="mono">POST /api/v1/sync</strong>
+          <span class="node-d">idempotent, bis zu 100 Operationen je Request</span>
+        </li>
+        <li class="node">
+          <span class="node-k mono">Server</span>
+          <strong>PostgreSQL 16</strong>
+          <span class="node-d">Versionsnummer je Entität (Workout, Übung, Satz)</span>
+        </li>
+      </ol>
+
+      <div class="sync-grid">
+        <div class="pane">
+          <div class="pane-bar"><span class="mono">Antwort je Operation</span><span class="mono dim">status</span></div>
+<dl class="codes">
+            <div><dt class="c-ok">applied</dt><dd>übernommen, neue Version zurück</dd></div>
+            <div><dt class="c-ok">duplicate</dt><dd><span class="mono">opId</span> schon verarbeitet, kein Doppeleintrag</dd></div>
+            <div><dt class="c-warn">conflict</dt><dd>anderes Gerät war schneller, Serverstand wird mitgeliefert</dd></div>
+            <div><dt class="c-err">not_found</dt><dd>Entität existiert nicht (mehr)</dd></div>
+            <div><dt class="c-err">rejected</dt><dd>Validierung fehlgeschlagen, mit Fehlertext</dd></div>
+          </dl>
+        </div>
+        <ul class="checklist">
+          <li><strong>Keine stillen Überschreibungen.</strong> Hat ein anderes Gerät dieselbe Entität seit deiner Basisversion geändert, zeigt die App beide Stände, und du entscheidest.</li>
+          <li><strong>Wiederholbar.</strong> Bricht die Verbindung mitten im Request ab, wird einfach erneut gesendet. Doppelte <span class="mono">opId</span>s werden serverseitig erkannt.</li>
+          <li><strong>Reload-fest.</strong> Ein offline begonnenes Workout übersteht das Neuladen der Seite. Das ist durch einen End-to-End-Test abgedeckt.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Self-hosting -->
+  <section class="section" id="self-hosting" aria-labelledby="sh-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker mono"><span>04</span> Self-Hosting</p>
+        <h2 id="sh-title">Drei Container, ein Server, deine Daten.</h2>
+        <p class="section-sub">
+          Docker Compose startet PostgreSQL, die API und den Web-Client hinter nginx.
+          Kein Firebase, kein Supabase, keine kostenpflichtigen Drittanbieter-APIs.
+        </p>
+      </header>
+
+      <div class="sh-grid">
+        <ol class="steps">
+          <li class="step">
+            <p class="step-t"><span class="mono">1</span> Repository holen</p>
+            <div class="term">
+              <pre><code><span class="prompt" aria-hidden="true">$ </span>git clone &lt;repo-url&gt; satzio &amp;&amp; cd satzio</code></pre>
+              <button class="copy" type="button" data-copy="git clone &lt;repo-url&gt; satzio &amp;&amp; cd satzio">Kopieren</button>
+            </div>
+          </li>
+          <li class="step">
+            <p class="step-t"><span class="mono">2</span> Secrets erzeugen</p>
+            <div class="term">
+              <pre><code><span class="prompt" aria-hidden="true">$ </span>./scripts/setup.sh</code></pre>
+              <button class="copy" type="button" data-copy="./scripts/setup.sh">Kopieren</button>
+            </div>
+            <p class="step-d">Schreibt eine <span class="mono">.env</span> mit zufälligen Datenbank- und Token-Secrets.</p>
+          </li>
+          <li class="step">
+            <p class="step-t"><span class="mono">3</span> Starten</p>
+            <div class="term">
+              <pre><code><span class="prompt" aria-hidden="true">$ </span>docker compose up -d --build</code></pre>
+              <button class="copy" type="button" data-copy="docker compose up -d --build">Kopieren</button>
+            </div>
+            <p class="step-d">Für den Betrieb im Internet einen Reverse Proxy mit TLS davorschalten.</p>
+          </li>
+        </ol>
+
+        <div class="security">
+          <h3>Sicherheit &amp; Datenschutz</h3>
+          <dl class="kv">
+            <div><dt>Passwörter</dt><dd>Argon2id</dd></div>
+            <div><dt>Sitzungen</dt><dd>Rotierende Refresh-Tokens im HttpOnly-Cookie</dd></div>
+            <div><dt>CSRF</dt><dd>Double-Submit-Token</dd></div>
+            <div><dt>Missbrauch</dt><dd>Rate Limiting auf Auth-Endpunkten</dd></div>
+            <div><dt>Isolation</dt><dd>Konten-Trennung durch API-Tests geprüft</dd></div>
+            <div><dt>Datenexport</dt><dd>Export und Import als JSON und CSV</dd></div>
+            <div><dt>Löschen</dt><dd>Konto inklusive aller Daten in der App löschbar</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screens -->
+  <section class="section" id="screens" aria-labelledby="screens-title">
+    <div class="wrap">
+      <header class="section-head section-head-row">
+        <div>
+          <p class="kicker mono"><span>05</span> Screens</p>
+          <h2 id="screens-title">So sieht es aus.</h2>
+        </div>
+        <p class="section-sub small">Unbearbeitete Screenshots der Web-App, 390 px Viewport.</p>
+      </header>
+    </div>
+    <div class="strip" tabindex="0" role="region" aria-label="Screenshots, horizontal scrollbar">
+      <figure class="shot"><img src="assets/03-heute.webp" width="540" height="1099" loading="lazy" alt="Startseite „Heute“ mit dem nächsten Training PUSH aus dem Plan Push/Pull/Legs und der Übungsliste."><figcaption><span class="mono">heute</span>Nächstes Training aus dem aktiven Plan</figcaption></figure>
+      <figure class="shot"><img src="assets/04-workout-liste.webp" width="540" height="1099" loading="lazy" alt="Workout in der Listenansicht mit abgehakten Sätzen und Gewichts-Schnellwahl."><figcaption><span class="mono">workout/liste</span>Sätze inline bearbeiten und abhaken</figcaption></figure>
+      <figure class="shot"><img src="assets/05-workout-gefuehrt.webp" width="540" height="1099" loading="lazy" alt="Geführter Modus: ein Satz pro Bildschirm mit großen Plus-/Minus-Tasten und Pausentimer."><figcaption><span class="mono">workout/geführt</span>Ein Satz pro Bildschirm</figcaption></figure>
+      <figure class="shot"><img src="assets/06-zusammenfassung.webp" width="540" height="1099" loading="lazy" alt="Zusammenfassung nach dem Training mit Dauer, Sätzen, Wiederholungen und Trainingsvolumen."><figcaption><span class="mono">zusammenfassung</span>Volumen, Sätze, neue Rekorde</figcaption></figure>
+      <figure class="shot"><img src="assets/07-notizen-import.webp" width="540" height="1099" loading="lazy" alt="Vorschau des Notizen-Imports mit erkannten Übungen; unsichere Sätze sind farbig hinterlegt."><figcaption><span class="mono">plaene/import</span>Import-Vorschau, Unsicheres markiert</figcaption></figure>
+      <figure class="shot"><img src="assets/08-fortschritt.webp" width="540" height="1099" loading="lazy" alt="Fortschrittsansicht mit Verlaufsdiagramm für Bankdrücken: Höchstgewicht und geschätztes 1RM."><figcaption><span class="mono">fortschritt</span>Verlauf je Übung, 1RM als Schätzung</figcaption></figure>
+      <figure class="shot"><img src="assets/10-uebung-detail.webp" width="540" height="1099" loading="lazy" alt="Übungsdetail Bankdrücken mit anatomischer Muskelkarte (Vorder- und Rückseite) und Ausführungsschritten."><figcaption><span class="mono">übungen</span>184 Übungen mit Muskelkarte und Ausführung</figcaption></figure>
+      <figure class="shot"><img src="assets/02-onboarding.webp" width="540" height="1099" loading="lazy" alt="Onboarding, Schritt 1 von 4: Auswahl des Trainingsziels."><figcaption><span class="mono">onboarding</span>Schritt 1 von 4: Trainingsziel</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- Tech -->
+  <section class="section" id="technik" aria-labelledby="tech-title">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker mono"><span>06</span> Technik</p>
+        <h2 id="tech-title">Stack und Qualitätssicherung.</h2>
+      </header>
+
+      <div class="table-scroll">
+        <table class="spec">
+          <caption class="sr-only">Technische Daten</caption>
+          <tbody>
+            <tr><th scope="row">Web-Client</th><td>React 19, Vite, Tailwind CSS, TanStack Query, Zustand</td></tr>
+            <tr><th scope="row">Offline-Speicher</th><td>IndexedDB über Dexie, Outbox-Muster, Service Worker für die App-Shell</td></tr>
+            <tr><th scope="row">Mobile</th><td>Capacitor für Android und iOS (gleiche Codebasis wie Web)</td></tr>
+            <tr><th scope="row">API</th><td>NestJS 11, Validierung mit Zod, OpenAPI-Dokumentation</td></tr>
+            <tr><th scope="row">Datenbank</th><td>PostgreSQL 16, Prisma 6</td></tr>
+            <tr><th scope="row">Geteilte Logik</th><td>Parser, Smart Defaults, Progression, Serien und Rekorde als eigenes Paket, von Client und Server genutzt</td></tr>
+            <tr><th scope="row">Betrieb</th><td>Docker Compose: <span class="mono">postgres</span>, <span class="mono">api</span>, <span class="mono">web</span> (nginx)</td></tr>
+            <tr><th scope="row">Tests</th><td>Automatisierte Tests decken ab: die geteilte Logik (Unit-Tests), die API mit 36 Integrationstests inklusive Konten-Isolation sowie den kompletten Trainingsablauf und den Offline-Betrieb per Playwright-E2E.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <div class="wrap cta-inner">
+      <h2 id="cta-title">Trainieren. Abhaken. Stärker werden.</h2>
+      <div class="actions">
+        <a class="btn btn-primary" href="/app/" data-app-link>Web-App öffnen</a>
+        <a class="btn btn-ghost" href="#self-hosting">Installationsanleitung</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      <span class="wordmark wordmark-sm">SATZIO</span>
+      <p class="dim small">Betrieben von [Betreiber eintragen] · Lizenz: [Lizenz eintragen]</p>
+    </div>
+    <nav aria-label="Rechtliches" class="footer-nav">
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="/app/" data-app-link>Web-App</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>

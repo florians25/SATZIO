@@ -3,6 +3,8 @@
 #   docker compose up -d --build
 # Optionaler Mail-Testdienst für die Entwicklung:
 #   docker compose --profile dev up -d --build   → Mailpit-Oberfläche auf :8025
+# Optionale Produktwebsite:
+#   docker compose --profile website up -d --build → http://localhost:8090
 
 name: satzio
 
@@ -76,6 +78,22 @@ services:
     ports:
       - '${WEB_BIND:-0.0.0.0}:${WEB_PORT:-8080}:8080'
     networks: [frontend]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ['no-new-privileges:true']
+    cap_drop: [ALL]
+
+  website:
+    build:
+      context: .
+      dockerfile: docker/website.Dockerfile
+      args:
+        APP_URL: ${PUBLIC_URL:-http://localhost:8080}
+    image: satzio/website:${SATZIO_VERSION:-latest}
+    profiles: [website]
+    restart: unless-stopped
+    ports:
+      - '${WEB_BIND:-0.0.0.0}:${WEBSITE_PORT:-8090}:8080'
     read_only: true
     tmpfs: [/tmp]
     security_opt: ['no-new-privileges:true']
