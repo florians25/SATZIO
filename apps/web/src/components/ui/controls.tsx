@@ -7,13 +7,14 @@ import { cn } from '@/lib/cn';
 export function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimitive.Root>) {
   return (
     <SwitchPrimitive.Root
+      data-ui="switch"
       className={cn(
         'relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border border-border bg-surface-3 transition data-[state=checked]:border-primary data-[state=checked]:bg-primary',
         className,
       )}
       {...props}
     >
-      <SwitchPrimitive.Thumb className="block h-5 w-5 translate-x-1 rounded-full bg-text shadow transition data-[state=checked]:translate-x-6 data-[state=checked]:bg-primary-fg" />
+      <SwitchPrimitive.Thumb data-ui="switch-thumb" className="block h-5 w-5 translate-x-1 rounded-full bg-text shadow transition data-[state=checked]:translate-x-6 data-[state=checked]:bg-primary-fg" />
     </SwitchPrimitive.Root>
   );
 }
@@ -35,7 +36,7 @@ export function Segmented<T extends string | number>({
   ariaLabel?: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className={cn('flex gap-1 rounded-2xl bg-surface-2 p-1', className)}>
+    <div role="radiogroup" data-ui="segmented" aria-label={ariaLabel} className={cn('flex gap-1 rounded-2xl bg-surface-2 p-1', className)}>
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -58,11 +59,12 @@ export function Segmented<T extends string | number>({
 
 export const Tabs = TabsPrimitive.Root;
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
-  return <TabsPrimitive.List className={cn('no-scrollbar flex gap-1 overflow-x-auto rounded-2xl bg-surface-2 p-1', className)} {...props} />;
+  return <TabsPrimitive.List data-ui="tabs" className={cn('no-scrollbar flex gap-1 overflow-x-auto rounded-2xl bg-surface-2 p-1', className)} {...props} />;
 }
 export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
+      data-ui="tab-trigger"
       className={cn(
         'h-10 flex-1 whitespace-nowrap rounded-xl px-3 text-sm font-semibold text-muted transition data-[state=active]:bg-surface data-[state=active]:text-text data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-border',
         className,
@@ -93,6 +95,7 @@ export function ChoiceTile({
       role="radio"
       aria-checked={selected}
       onClick={onClick}
+      data-ui="choice"
       className={cn(
         'flex min-h-14 w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition active:scale-[0.99]',
         selected ? 'border-primary bg-primary/10' : 'border-border bg-surface hover:bg-surface-2',
@@ -127,7 +130,7 @@ export function ListRow({
 }) {
   const content = (
     <>
-      {icon && <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-muted [&>svg]:h-5 [&>svg]:w-5', danger && 'text-error')}>{icon}</span>}
+      {icon && <span data-ui="row-icon" className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface-2 text-muted [&>svg]:h-5 [&>svg]:w-5', danger && 'text-error')}>{icon}</span>}
       <span className="min-w-0 flex-1">
         <span className={cn('block truncate font-medium', danger && 'text-error')}>{title}</span>
         {subtitle && <span className="block truncate text-sm text-muted">{subtitle}</span>}

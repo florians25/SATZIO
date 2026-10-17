@@ -23,7 +23,7 @@ export function UpdatePrompt() {
   }, []);
   if (!update) return null;
   return (
-    <div className="fixed inset-x-3 top-3 z-[70] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-float pt-safe">
+    <div data-ui="banner" className="glass fixed inset-x-3 top-3 z-[70] mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-border bg-surface p-3 shadow-float pt-safe">
       <p className="flex-1 text-sm">Eine neue Version von SATZIO ist verfügbar.</p>
       <Button size="sm" onClick={update}>
         Aktualisieren

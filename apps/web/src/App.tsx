@@ -35,6 +35,12 @@ const DataPage = lazy(() => import('./routes/profile/DataPage'));
 const Privacy = lazy(() => import('./routes/profile/PrivacyPage'));
 const Achievements = lazy(() => import('./routes/profile/AchievementsPage'));
 const BodyPage = lazy(() => import('./routes/profile/BodyPage'));
+const Social = lazy(() => import('./routes/social/SocialPage'));
+const AddFriend = lazy(() => import('./routes/social/AddFriendPage'));
+const InviteNew = lazy(() => import('./routes/social/InviteNewPage'));
+const InviteDetail = lazy(() => import('./routes/social/InviteDetailPage'));
+const JoinInvite = lazy(() => import('./routes/social/JoinInvitePage'));
+const SocialLinkGate = lazy(() => import('./routes/social/SocialLinkGate'));
 
 function RequireAuth({ children }: { children: ReactNode }) {
   const status = useAuth((s) => s.status);
@@ -82,6 +88,8 @@ export function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+            <Route path="/friends/add/:code" element={<SocialLinkGate kind="friend" />} />
+            <Route path="/invites/join/:token" element={<SocialLinkGate kind="join" />} />
             <Route element={<RequireAuth><AppShell /></RequireAuth>}>
               <Route index element={<Today />} />
               <Route path="workout/:id" element={<Workout />} />
@@ -103,6 +111,11 @@ export function App() {
               <Route path="profile/privacy" element={<Privacy />} />
               <Route path="profile/achievements" element={<Achievements />} />
               <Route path="profile/body" element={<BodyPage />} />
+              <Route path="social" element={<Social />} />
+              <Route path="social/add/:code" element={<AddFriend />} />
+              <Route path="social/join/:token" element={<JoinInvite />} />
+              <Route path="invites/new" element={<InviteNew />} />
+              <Route path="invites/:id" element={<InviteDetail />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

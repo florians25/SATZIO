@@ -14,6 +14,8 @@ export * from './achievements';
 export * from './schemas';
 export * from './account-schemas';
 export * from './api-types';
+export * from './social-schemas';
+export * from './social-types';
 export * from './parser';
 export * from './data/exercises';
 export * from './data/templates';

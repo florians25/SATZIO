@@ -36,6 +36,7 @@ export function SyncIndicator() {
       <button
         type="button"
         onClick={() => setOpen(true)}
+        data-ui="sync-chip"
         className="flex h-9 items-center gap-1.5 rounded-full bg-surface-2 px-3 text-xs font-semibold text-muted"
         aria-label="Synchronisationsstatus"
       >

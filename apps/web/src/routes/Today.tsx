@@ -16,7 +16,9 @@ import { fmtDateLong, fmtWeight, greeting, todayKey } from '@/lib/format';
 import { useT } from '@/lib/i18n';
 import { qk, useExerciseMap, usePerformance, useToday } from '@/lib/queries';
 import { createWorkout, reconcileActiveSessions, useActiveWorkouts } from '@/lib/workout';
+import { usePendingSocial } from '@/lib/social';
 import { createEmptyPlan } from './plans/plan-utils';
+import { TodayInvitesCard } from './social/TodayInvitesCard';
 
 export default function Today() {
   const t = useT();
@@ -29,10 +31,11 @@ export default function Today() {
   const { map: performance } = usePerformance();
   const exercises = useExerciseMap();
   const unit = user.settings.unit;
+  usePendingSocial();
 
   useEffect(() => {
-    if (today.data) void reconcileActiveSessions(today.data.activeSessions);
-  }, [today.data]);
+    if (today.data) void reconcileActiveSessions(today.data.activeSessions, today.dataUpdatedAt);
+  }, [today.data, today.dataUpdatedAt]);
 
   const data = today.data;
   const plan = data?.plan ?? null;
@@ -88,6 +91,8 @@ export default function Today() {
         )}
 
         {current && <ActiveCard id={current.id} />}
+
+        <TodayInvitesCard />
 
         {!data && today.isLoading && <Skeleton className="h-64 rounded-3xl" />}
         {!data && today.isError && !current && (

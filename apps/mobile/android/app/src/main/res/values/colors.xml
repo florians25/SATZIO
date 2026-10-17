@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SATZIO Markenfarben -->
+    <color name="satzio_bg">#0B0F0E</color>
+    <color name="satzio_navbar">#1A201C</color>
+    <color name="satzio_neon">#B7FF3C</color>
+</resources>

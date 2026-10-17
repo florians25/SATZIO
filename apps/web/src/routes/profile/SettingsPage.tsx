@@ -103,7 +103,7 @@ export default function SettingsPage() {
             <Row title="Ton am Pausenende">
               <Switch checked={s.soundEnabled} onCheckedChange={(v) => set({ soundEnabled: v })} />
             </Row>
-            <Row title="Benachrichtigungen" hint="Pausenende, wenn die App im Hintergrund ist – nur solange der Browser die App aktiv hält (iOS stark eingeschränkt)">
+            <Row title="Benachrichtigungen" hint="Pausenende im Hintergrund – in der iOS-/Android-App zuverlässig, auch bei gesperrtem Gerät (Erlaubnis beim ersten Pausentimer). Im Browser nur, solange er die App aktiv hält.">
               <Switch
                 checked={s.notificationsEnabled}
                 onCheckedChange={async (v) => {

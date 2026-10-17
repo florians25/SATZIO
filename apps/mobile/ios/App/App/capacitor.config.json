@@ -25,6 +25,14 @@
 			"splashFullScreen": false,
 			"splashImmersive": false
 		},
+		"LocalNotifications": {
+			"smallIcon": "ic_stat_satzio",
+			"iconColor": "#B7FF3C"
+		},
+		"Keyboard": {
+			"resize": "native",
+			"resizeOnFullScreen": true
+		},
 		"StatusBar": {
 			"style": "DARK",
 			"backgroundColor": "#0B0F0E",
@@ -32,7 +40,11 @@
 		}
 	},
 	"packageClassList": [
+		"KeepAwakePlugin",
+		"AppPlugin",
 		"HapticsPlugin",
+		"KeyboardPlugin",
+		"LocalNotificationsPlugin",
 		"PreferencesPlugin",
 		"SplashScreenPlugin",
 		"StatusBarPlugin"

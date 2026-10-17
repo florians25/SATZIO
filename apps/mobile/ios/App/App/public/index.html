@@ -20,12 +20,22 @@
         if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         document.documentElement.dataset.theme = t;
       } catch (e) {}
+      // Plattform-Design vor dem ersten Paint (iOS Liquid Glass / Android Material 3); maßgeblich: src/lib/platform.ts
+      try {
+        var p = null;
+        try { p = localStorage.getItem('satzio-platform-style'); } catch (e) {}
+        if (p !== 'ios' && p !== 'android' && p !== 'web') {
+          var ua = navigator.userAgent;
+          p = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) ? 'ios' : /Android/i.test(ua) ? 'android' : 'web';
+        }
+        document.documentElement.dataset.platform = p;
+      } catch (e) {}
     </script>
-    <script type="module" crossorigin src="/assets/index-DAwc-4fk.js"></script>
+    <script type="module" crossorigin src="/assets/index-CEwaq4CV.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/data-CK6Tr_-o.js">
     <link rel="modulepreload" crossorigin href="/assets/react-Bik-GMVl.js">
     <link rel="modulepreload" crossorigin href="/assets/charts-ROIOCDrI.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-tg8PeAOD.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-CkZbHGUd.css">
   <link rel="manifest" href="/manifest.webmanifest"></head>
   <body>
     <div id="root"></div>

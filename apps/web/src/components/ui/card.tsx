@@ -2,7 +2,7 @@ import * as React from 'react';
 import { cn } from '@/lib/cn';
 
 export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('rounded-[var(--radius-card)] border border-border bg-surface', className)} {...props} />;
+  return <div data-ui="card" className={cn('rounded-[var(--radius-card)] border border-border bg-surface', className)} {...props} />;
 }
 
 export function SectionTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
@@ -17,7 +17,7 @@ export function Badge({ className, tone = 'default', ...props }: React.HTMLAttri
     warning: 'bg-warning/15 text-warning border-warning/30',
     error: 'bg-error/15 text-error border-error/30',
   };
-  return <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', tones[tone], className)} {...props} />;
+  return <span data-ui="badge" className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', tones[tone], className)} {...props} />;
 }
 
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -27,7 +27,7 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   const v = Math.max(0, Math.min(100, value));
   return (
-    <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-surface-3', className)} role="progressbar" aria-valuenow={Math.round(v)} aria-valuemin={0} aria-valuemax={100}>
+    <div data-ui="progress" className={cn('h-1.5 w-full overflow-hidden rounded-full bg-surface-3', className)} role="progressbar" aria-valuenow={Math.round(v)} aria-valuemin={0} aria-valuemax={100}>
       <div className="h-full rounded-full bg-primary transition-[width] duration-300" style={{ width: `${v}%` }} />
     </div>
   );

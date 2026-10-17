@@ -48,6 +48,10 @@ export interface UserSettingsView {
   progressionEnabled: boolean;
   gamificationEnabled: boolean;
   workoutMode: WorkoutMode;
+  /** Freundschaftsanfragen per Benutzername erlauben (Einladungslink funktioniert immer). */
+  allowFriendRequests: boolean;
+  /** Freunde sehen letztes Training & Serie. */
+  shareActivityWithFriends: boolean;
 }
 
 export interface UserView {

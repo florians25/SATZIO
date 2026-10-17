@@ -553,13 +553,18 @@ export async function createWorkout(o: StartOptions): Promise<LocalWorkout> {
 }
 
 /** Übernimmt Server-Stände aktiver Trainings, ohne lokale, unsynchronisierte Änderungen zu überschreiben. */
-export async function reconcileActiveSessions(server: WorkoutSessionView[]) {
+/**
+ * Gleicht lokal aktive Trainings mit der Serverliste ab. `fetchedAt` ist der Zeitpunkt der
+ * Serverantwort: Lokale Änderungen danach (z. B. gerade gestartetes Training bei noch
+ * gecachter /today-Antwort) dürfen von veralteten Daten nicht überschrieben/gelöscht werden.
+ */
+export async function reconcileActiveSessions(server: WorkoutSessionView[], fetchedAt = Date.now()) {
   await queueWrite(async () => {
     const ids = new Set(server.map((s) => s.id));
     for (const s of server) {
       const local = await db.workouts.get(s.id);
       const pending = await db.outbox.where('sessionId').equals(s.id).count();
-      if (!local || (pending === 0 && s.version >= local.version)) {
+      if (!local || (pending === 0 && s.version >= local.version && local.localUpdatedAt <= fetchedAt)) {
         await db.workouts.put({ ...s, localUpdatedAt: Date.now() });
         const cur = useWorkout.getState().session;
         if (cur?.id === s.id && pending === 0) useWorkout.setState({ session: { ...s, localUpdatedAt: Date.now() } });
@@ -568,7 +573,7 @@ export async function reconcileActiveSessions(server: WorkoutSessionView[]) {
     // Lokal aktive, bereits synchronisierte Trainings, die der Server nicht mehr als aktiv kennt
     const localActive = await db.workouts.where('status').anyOf('active', 'paused').toArray();
     for (const l of localActive) {
-      if (ids.has(l.id) || l.version === 0) continue;
+      if (ids.has(l.id) || l.version === 0 || l.localUpdatedAt > fetchedAt) continue;
       const pending = await db.outbox.where('sessionId').equals(l.id).count();
       if (pending === 0) await db.workouts.delete(l.id);
     }

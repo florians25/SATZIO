@@ -1,0 +1,1093 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLATTFORM-DESIGNS
+   <html data-platform="ios|android|web"> wird in index.html / lib/platform.ts gesetzt.
+   • ios     → iOS 26 „Liquid Glass“: Glasflächen, schwebende Tab-Bar, SF-Schrift
+   • android → Material Design 3: Tonflächen, Navigationsleiste mit Indikator, Roboto
+   • web     → unverändert (Desktop)
+   Bewusst NICHT in einem @layer: Diese Regeln überstimmen die Tailwind-Utilities
+   der gemeinsamen Komponenten (die per data-ui="…" markiert sind) – Routen bleiben unberührt.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Sanfte Feder (leichtes Überschwingen) – iOS-typisch */
+  --ease-spring: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001);
+  /* Material 3 „emphasized decelerate“ */
+  --ease-m3: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-m3-std: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   iOS · LIQUID GLASS
+   ──────────────────────────────────────────────────────────────────────────── */
+
+html[data-platform='ios'] {
+  --radius-card: 1.625rem;
+  --glass-blur: 22px;
+  --glass-sat: 190%;
+  /* dunkel */
+  --glass-tint: rgb(36 44 41 / 0.46);
+  --glass-tint-strong: rgb(22 28 26 / 0.74);
+  --glass-tint-press: rgb(255 255 255 / 0.1);
+  --glass-edge: rgb(255 255 255 / 0.11);
+  --glass-spec-a: rgb(255 255 255 / 0.5);
+  --glass-spec-b: rgb(255 255 255 / 0.04);
+  --glass-shadow: 0 12px 40px rgb(0 0 0 / 0.42), 0 2px 6px rgb(0 0 0 / 0.28);
+  --glass-inner: inset 0 1px 0.5px rgb(255 255 255 / 0.16), inset 0 -0.5px 0.5px rgb(255 255 255 / 0.06);
+  --lens: rgb(255 255 255 / 0.11);
+  --ios-separator: rgb(255 255 255 / 0.08);
+  --ios-fill: rgb(118 128 122 / 0.24);
+  --border: rgb(255 255 255 / 0.075);
+  --surface: #141a18;
+  --surface-2: #1d2421;
+  --surface-3: #29322e;
+}
+
+html[data-platform='ios'][data-theme='light'] {
+  --glass-tint: rgb(255 255 255 / 0.56);
+  --glass-tint-strong: rgb(250 252 250 / 0.8);
+  --glass-tint-press: rgb(0 0 0 / 0.05);
+  --glass-edge: rgb(255 255 255 / 0.7);
+  --glass-spec-a: rgb(255 255 255 / 1);
+  --glass-spec-b: rgb(255 255 255 / 0.25);
+  --glass-shadow: 0 12px 36px rgb(20 40 30 / 0.14), 0 1px 4px rgb(20 40 30 / 0.08);
+  --glass-inner: inset 0 1px 0.5px rgb(255 255 255 / 0.9), inset 0 -0.5px 0.5px rgb(0 0 0 / 0.04);
+  --lens: rgb(20 30 25 / 0.07);
+  --ios-separator: rgb(0 0 0 / 0.08);
+  --ios-fill: rgb(118 128 122 / 0.14);
+  --bg: #f2f4f2;
+  --surface: #ffffff;
+  --surface-2: #eef1ee;
+  --surface-3: #e1e6e2;
+  --border: rgb(0 0 0 / 0.06);
+}
+
+html[data-platform='ios'] body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro', 'Inter Variable', system-ui, sans-serif;
+  font-feature-settings: normal;
+  letter-spacing: -0.008em;
+  background: transparent;
+}
+
+/* Ambientes Leuchten hinter allem – gibt dem Glas etwas zum Brechen */
+html[data-platform='ios'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 45% at 8% -6%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 70%),
+    radial-gradient(60% 40% at 105% 18%, rgb(56 210 180 / 0.09), transparent 70%),
+    radial-gradient(80% 50% at 50% 115%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 70%),
+    var(--bg);
+}
+html[data-platform='ios'][data-theme='light'] body::before {
+  background:
+    radial-gradient(70% 45% at 8% -6%, rgb(183 255 60 / 0.28), transparent 70%),
+    radial-gradient(60% 40% at 105% 18%, rgb(56 210 180 / 0.16), transparent 70%),
+    radial-gradient(80% 50% at 50% 115%, rgb(183 255 60 / 0.14), transparent 70%),
+    var(--bg);
+}
+
+/* ── Glas-Grundmaterial ── */
+/* Im components-Layer: explizite Positions-Utilities (absolute/fixed/sticky) gewinnen weiterhin */
+@layer components {
+  html[data-platform='ios'] :is(.glass, [data-ui='header-back'], [data-ui='header-actions'], [data-ui='button']) {
+    position: relative;
+  }
+  html[data-platform='android'] [data-ripple] {
+    position: relative;
+  }
+}
+
+html[data-platform='ios'] :is(
+    [data-ui='tabbar'],
+    [data-ui='resume-bar'],
+    [data-ui='rest-pill'],
+    [data-ui='toast'],
+    [data-ui='banner'],
+    [data-ui='header-back'],
+    [data-ui='header-actions']:not(:empty),
+    [data-ui='button'][data-variant='secondary'],
+    [data-ui='button'][data-variant='outline'],
+    [data-ui='header'] [data-ui='button'][data-variant='ghost'],
+    [data-ui='sheet-close'],
+    [data-ui='chip']:not([aria-pressed='true'])
+  ) {
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 0.5px solid var(--glass-edge);
+  box-shadow: var(--glass-inner), var(--glass-shadow);
+  color: var(--text);
+}
+
+/* Spiegelnde Kante: Lichtverlauf nur im Rand (Maske) */
+html[data-platform='ios'] :is(
+    [data-ui='tabbar'],
+    [data-ui='resume-bar'],
+    [data-ui='rest-pill'],
+    [data-ui='sheet'],
+    [data-ui='header-actions']:not(:empty),
+    [data-ui='header-back'],
+    [data-ui='button'][data-variant='secondary'],
+    [data-ui='button'][data-variant='primary'],
+    [data-ui='banner']
+  )::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    150deg,
+    var(--glass-spec-a) 0%,
+    var(--glass-spec-b) 28%,
+    transparent 50%,
+    var(--glass-spec-b) 76%,
+    color-mix(in srgb, var(--glass-spec-a) 60%, transparent) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* Glas-Knöpfe reagieren wie eine Linse: leicht größer & heller beim Drücken */
+html[data-platform='ios'] :is([data-ui='button'], [data-ui='header-back'], [data-ui='sheet-close'], [data-ui='chip'], [data-ui='tab'], [data-ui='resume-bar']) {
+  transition:
+    transform 420ms var(--ease-spring),
+    background-color 200ms ease,
+    box-shadow 200ms ease,
+    opacity 200ms ease;
+}
+html[data-platform='ios'] :is([data-ui='button'][data-variant='secondary'], [data-ui='button'][data-variant='outline'], [data-ui='header-back'], [data-ui='sheet-close'], [data-ui='chip']):active {
+  transform: scale(1.04);
+  background-color: color-mix(in srgb, var(--glass-tint) 70%, var(--text) 12%);
+}
+
+/* ── Schwebende Tab-Bar ── */
+html[data-platform='ios'] [data-ui='bottom-bar'] {
+  padding-bottom: max(10px, calc(env(safe-area-inset-bottom) - 12px));
+  pointer-events: none;
+}
+html[data-platform='ios'] [data-ui='bottom-bar'] > * {
+  pointer-events: auto;
+}
+html[data-platform='ios'] [data-ui='bottom-bar'] > div:first-child {
+  padding-inline: 16px;
+  max-width: 30rem;
+}
+html[data-platform='ios'] [data-ui='tabbar'] {
+  margin-inline: auto;
+  width: calc(100% - 32px);
+  max-width: 28rem;
+  border-radius: 999px;
+  padding: 4px;
+  border-top-width: 0.5px;
+}
+html[data-platform='ios'] [data-ui='tabbar'] ul {
+  gap: 0;
+}
+html[data-platform='ios'] [data-ui='tab'] {
+  height: 54px;
+  gap: 1px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+html[data-platform='ios'] [data-ui='tab']:not([aria-current='page']) {
+  opacity: 0.86;
+}
+html[data-platform='ios'] [data-ui='tab'][aria-current='page'] {
+  color: var(--primary);
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='tab'][aria-current='page'] {
+  color: #3f7400;
+}
+html[data-platform='ios'] [data-ui='tab']:active {
+  transform: scale(0.94);
+}
+html[data-platform='ios'] [data-ui='tab-icon'] svg {
+  width: 25px;
+  height: 25px;
+}
+html[data-platform='ios'] [data-ui='tab-lens'] {
+  inset: 0 2px;
+  border-radius: 999px;
+  background: var(--lens);
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.14),
+    inset 0 0 0 0.5px rgb(255 255 255 / 0.05);
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='tab-lens'] {
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.9),
+    inset 0 0 0 0.5px rgb(0 0 0 / 0.03);
+}
+
+/* „Training läuft“ als Glas-Zubehörleiste über der Tab-Bar (wie Mini-Player) */
+html[data-platform='ios'] [data-ui='resume-bar'] {
+  height: 50px;
+  border-radius: 999px;
+  padding-inline: 18px;
+  font-size: 15px;
+}
+html[data-platform='ios'] [data-ui='resume-dot'] span {
+  background: var(--primary);
+}
+html[data-platform='ios'] [data-ui='resume-cta'] {
+  color: var(--primary);
+  font-weight: 700;
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='resume-cta'] {
+  color: #3f7400;
+}
+html[data-platform='ios'] [data-ui='rest-pill'] {
+  height: 46px;
+  border-radius: 999px;
+  padding-inline: 16px 6px;
+}
+html[data-platform='ios'] [data-ui='rest-skip'] {
+  border-radius: 999px;
+  background: var(--glass-tint-press);
+  color: var(--text);
+  font-weight: 600;
+}
+html[data-platform='ios'] .pb-nav {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+html[data-platform='ios'] [data-ui='toast'] {
+  border-radius: 999px;
+}
+html[data-platform='ios'] [data-ui='toast'][data-tone='highlight'] {
+  background: color-mix(in srgb, var(--primary) 85%, transparent);
+  color: var(--primary-fg);
+}
+html[data-platform='ios'] [data-ui='banner'] {
+  border-radius: 26px;
+}
+
+/* ── Navigationsleiste: transparent, beim Scrollen Glas mit weichem Rand ── */
+html[data-platform='ios'] [data-ui='header'] {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  isolation: isolate;
+}
+html[data-platform='ios'] [data-ui='header']::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -18px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 260ms ease;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 84%, transparent) 0%, color-mix(in srgb, var(--bg) 62%, transparent) 70%, transparent 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
+}
+html[data-platform='ios'] [data-ui='header'][data-scrolled]::before {
+  opacity: 1;
+}
+html[data-platform='ios'] [data-ui='header-bar'] {
+  min-height: 56px;
+  padding-inline: 16px;
+  gap: 10px;
+}
+html[data-platform='ios'] [data-ui='header-back'] {
+  margin-left: 0;
+  width: 44px;
+  height: 44px;
+}
+html[data-platform='ios'] [data-ui='header-back'] svg {
+  margin-left: -2px;
+}
+/* Titel mittig (Standard-Navigationsleiste) */
+html[data-platform='ios'] [data-ui='header']:not([data-large]) [data-ui='header-title'] {
+  position: absolute;
+  inset-inline: 72px;
+  text-align: center;
+  padding-left: 0;
+  pointer-events: none;
+}
+html[data-platform='ios'] [data-ui='header']:not([data-large]) [data-ui='header-title'] h1 {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+html[data-platform='ios'] [data-ui='header']:not([data-large]) [data-ui='header-title'] p {
+  font-size: 12px;
+}
+html[data-platform='ios'] [data-ui='header']:not([data-large]) [data-ui='header-actions'] {
+  margin-left: auto;
+}
+html[data-platform='ios'] [data-ui='header-actions']:not(:empty) {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 44px;
+  padding-inline: 2px;
+  border-radius: 999px;
+}
+html[data-platform='ios'] [data-ui='header-actions'] > :is([data-ui='button'], [data-ui='sync-chip']) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 999px;
+  color: var(--text);
+}
+html[data-platform='ios'] [data-ui='header-actions'] > [data-ui='button']::after {
+  display: none;
+}
+/* Eingeklappter Titel erscheint erst beim Scrollen (großer Titel scrollt weg) */
+html[data-platform='ios'] [data-ui='header-collapsed-title'] {
+  position: absolute;
+  inset-inline: 72px;
+  top: 50%;
+  translate: 0 -50%;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+html[data-platform='ios'] [data-ui='header'][data-scrolled] [data-ui='header-collapsed-title'] {
+  opacity: 1;
+}
+html[data-platform='ios'] [data-ui='header'][data-large] [data-ui='header-bar'] {
+  justify-content: flex-end;
+}
+html[data-platform='ios'] [data-ui='large-title'] {
+  padding: 2px 20px 14px;
+}
+html[data-platform='ios'] [data-ui='large-title'] h1 {
+  font-size: 34px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+html[data-platform='ios'] [data-ui='large-title'] p {
+  font-size: 15px;
+  margin-top: 2px;
+}
+
+/* ── Buttons: Kapseln ── */
+html[data-platform='ios'] [data-ui='button'] {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+html[data-platform='ios'] [data-ui='button'][data-variant='primary'] {
+  position: relative;
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.55),
+    inset 0 -1px 1px rgb(0 0 0 / 0.12),
+    0 6px 22px color-mix(in srgb, var(--primary) 28%, transparent);
+}
+html[data-platform='ios'] [data-ui='button'][data-variant='primary']:active,
+html[data-platform='ios'] [data-ui='button'][data-variant='danger-solid']:active {
+  transform: scale(0.97);
+  filter: brightness(1.06);
+}
+html[data-platform='ios'] [data-ui='button'][data-variant='ghost'] {
+  border-radius: 999px;
+}
+html[data-platform='ios'] [data-ui='button'][data-size='icon-sm'] {
+  border-radius: 999px;
+}
+html[data-platform='ios'] [data-ui='button'][data-variant='secondary'],
+html[data-platform='ios'] [data-ui='button'][data-variant='outline'] {
+  box-shadow: var(--glass-inner), 0 4px 16px rgb(0 0 0 / 0.14);
+}
+
+/* ── Karten & Inhalte: ruhige, gruppierte Flächen mit großen, weichen Radien ── */
+html[data-platform='ios'] [data-ui='card'] {
+  border-color: var(--border);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='card'] {
+  border-color: transparent;
+  box-shadow: 0 1px 2px rgb(15 30 20 / 0.05), 0 6px 24px rgb(15 30 20 / 0.05);
+}
+html[data-platform='ios'] [data-ui='input'] {
+  border-radius: 14px;
+  border-color: transparent;
+  background: var(--ios-fill);
+}
+html[data-platform='ios'] [data-ui='input']:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 55%, transparent);
+}
+html[data-platform='ios'] [data-ui='chip'] {
+  height: 34px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+html[data-platform='ios'] [data-ui='chip'][aria-pressed='true'] {
+  box-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.5), 0 4px 14px color-mix(in srgb, var(--primary) 25%, transparent);
+}
+html[data-platform='ios'] [data-ui='row-icon'] {
+  border-radius: 10px;
+}
+
+/* Segment-Steuerung & Tabs: iOS-26-Kapsel mit erhabenem Daumen */
+html[data-platform='ios'] :is([data-ui='segmented'], [data-ui='tabs']) {
+  border-radius: 999px;
+  background: var(--ios-fill);
+  padding: 3px;
+}
+html[data-platform='ios'] [data-ui='segmented'] > button,
+html[data-platform='ios'] [data-ui='tab-trigger'] {
+  border-radius: 999px;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+html[data-platform='ios'] [data-ui='segmented'] > button[aria-checked='true'],
+html[data-platform='ios'] [data-ui='tab-trigger'][data-state='active'] {
+  --tw-ring-shadow: 0 0 #0000;
+  background: color-mix(in srgb, var(--text) 16%, var(--surface-2));
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.12),
+    0 3px 10px rgb(0 0 0 / 0.22);
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='segmented'] > button[aria-checked='true'],
+html[data-platform='ios'][data-theme='light'] [data-ui='tab-trigger'][data-state='active'] {
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+}
+
+/* Schalter im iOS-Format */
+html[data-platform='ios'] [data-ui='switch'] {
+  width: 51px;
+  height: 31px;
+  border: 0;
+  background: var(--ios-fill);
+}
+html[data-platform='ios'] [data-ui='switch'][data-state='checked'] {
+  background: var(--primary);
+}
+html[data-platform='ios'] [data-ui='switch-thumb'] {
+  width: 27px;
+  height: 27px;
+  background: #fff;
+  translate: 2px 0;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06);
+  transition: translate 380ms var(--ease-spring);
+}
+html[data-platform='ios'] [data-ui='switch-thumb'][data-state='checked'] {
+  translate: 22px 0;
+  background: #fff;
+}
+
+/* ── Sheets: schwebendes Glas mit großen, kontinuierlichen Radien ── */
+html[data-platform='ios'] [data-ui='sheet-overlay'] {
+  background: rgb(0 0 0 / 0.32);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-platform='ios'] [data-ui='sheet'] {
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border-radius: 38px;
+  border: 0.5px solid var(--glass-edge);
+  background: var(--glass-tint-strong);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  backdrop-filter: blur(40px) saturate(200%);
+  box-shadow: var(--glass-inner), 0 24px 70px rgb(0 0 0 / 0.45);
+  max-height: calc(100dvh - env(safe-area-inset-top) - 24px);
+  overflow: hidden;
+}
+html[data-platform='ios'][data-theme='light'] [data-ui='sheet'] {
+  box-shadow: var(--glass-inner), 0 24px 60px rgb(20 40 30 / 0.2);
+}
+html[data-platform='ios'] [data-ui='sheet-handle'] {
+  width: 36px;
+  height: 5px;
+  margin-top: 7px;
+  background: color-mix(in srgb, var(--text) 28%, transparent);
+}
+html[data-platform='ios'] [data-ui='sheet-header'] {
+  align-items: center;
+  padding: 10px 14px 8px 22px;
+}
+html[data-platform='ios'] [data-ui='sheet-title'] {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+html[data-platform='ios'] [data-ui='sheet-close'] {
+  margin-right: 0;
+  width: 38px;
+  height: 38px;
+  color: var(--text);
+}
+html[data-platform='ios'] [data-ui='sheet-close'] svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.6;
+}
+html[data-platform='ios'] [data-ui='sheet-footer'] {
+  border-top-color: var(--ios-separator);
+}
+html[data-platform='ios'] [data-ui='sheet-sticky'] {
+  background: transparent;
+}
+html[data-platform='ios'] [data-ui='sheet'] :is(.divide-border, .divide-y) > * {
+  border-color: var(--ios-separator);
+}
+html[data-platform='ios'] [data-ui='sheet'] [data-ui='input'] {
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+}
+html[data-platform='ios'] [data-ui='sheet-action'] {
+  border-radius: 18px;
+  font-size: 16px;
+}
+html[data-platform='ios'] [data-ui='sheet-action']:hover {
+  background: transparent;
+}
+html[data-platform='ios'] [data-ui='sheet-action']:active {
+  background: var(--glass-tint-press);
+}
+@media (min-width: 640px) {
+  html[data-platform='ios'] [data-ui='sheet'] {
+    left: 50%;
+    right: auto;
+    bottom: auto;
+  }
+}
+
+/* Federnde Animationen */
+@keyframes ios-sheet-in {
+  from { transform: translateY(105%); }
+  to { transform: translateY(0); }
+}
+@keyframes ios-sheet-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(105%); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+@media (max-width: 639.98px) {
+  html[data-platform='ios'] [data-ui='sheet'][data-state='open'] {
+    animation: ios-sheet-in 560ms var(--ease-spring);
+  }
+  html[data-platform='ios'] [data-ui='sheet'][data-state='closed'] {
+    animation: ios-sheet-out 260ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+}
+html[data-platform='ios'] [data-ui='sheet-overlay'][data-state='open'],
+html[data-platform='android'] [data-ui='sheet-overlay'][data-state='open'] {
+  animation: fade-in 260ms ease;
+}
+html[data-platform='ios'] [data-ui='sheet-overlay'][data-state='closed'],
+html[data-platform='android'] [data-ui='sheet-overlay'][data-state='closed'] {
+  animation: fade-out 220ms ease forwards;
+}
+
+/* Barrierefreiheit: keine Transparenz gewünscht → massive Flächen */
+@media (prefers-reduced-transparency: reduce) {
+  html[data-platform='ios'] {
+    --glass-tint: var(--surface-2);
+    --glass-tint-strong: var(--surface);
+  }
+  html[data-platform='ios'] *,
+  html[data-platform='ios'] *::before {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  html[data-platform='ios'] [data-ui='header'][data-scrolled]::before {
+    background: var(--bg);
+    -webkit-mask-image: none;
+    mask-image: none;
+    border-bottom: 0.5px solid var(--ios-separator);
+  }
+}
+@media (prefers-contrast: more) {
+  html[data-platform='ios'] {
+    --glass-tint: var(--surface-2);
+    --glass-tint-strong: var(--surface);
+    --glass-edge: var(--text);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   ANDROID · MATERIAL DESIGN 3
+   ──────────────────────────────────────────────────────────────────────────── */
+
+html[data-platform='android'] {
+  --radius-card: 1rem;
+  /* M3-Farbrollen aus der Markenfarbe abgeleitet (dunkel) */
+  --bg: #0e1310;
+  --surface: #1a201c;
+  --surface-2: #242b26;
+  --surface-3: #2f3631;
+  --border: #3f4941;
+  --muted: #bfc9be;
+  --md-surface-container: #1a201c;
+  --md-surface-container-high: #242b26;
+  --md-surface-container-highest: #2f3631;
+  --md-secondary-container: #36452b;
+  --md-on-secondary-container: #d7ecc1;
+  --md-primary-container: #2e4d00;
+  --md-on-primary-container: #c6ff70;
+  --md-outline: #899387;
+  --md-scrim: rgb(0 0 0 / 0.4);
+  --md-elev-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --md-elev-3: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+  --md-state: rgb(255 255 255 / 0.1);
+}
+html[data-platform='android'][data-theme='light'] {
+  --bg: #f7fbf1;
+  --surface: #ecf0e6;
+  --surface-2: #e6eae0;
+  --surface-3: #e0e4da;
+  --border: #c2c9bb;
+  --muted: #43493f;
+  --text: #191d17;
+  --md-surface-container: #ecf0e6;
+  --md-surface-container-high: #e6eae0;
+  --md-surface-container-highest: #e0e4da;
+  --md-secondary-container: #d7e8c4;
+  --md-on-secondary-container: #121f07;
+  --md-primary-container: #c3f08f;
+  --md-on-primary-container: #0f2000;
+  --md-outline: #73796e;
+  --md-scrim: rgb(0 0 0 / 0.32);
+  --md-elev-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --md-elev-3: 0 1px 3px rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+  --md-state: rgb(0 0 0 / 0.08);
+}
+
+html[data-platform='android'] body {
+  font-family: Roboto, 'Roboto Flex', 'Google Sans Text', 'Inter Variable', system-ui, sans-serif;
+  font-feature-settings: normal;
+  letter-spacing: 0.01em;
+}
+
+/* Wellen-Feedback (lib/platform.ts setzt --rx/--ry und data-ripple) */
+@property --ripple-r {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes m3-ripple {
+  0% { --ripple-r: 0px; opacity: 1; }
+  60% { opacity: 1; }
+  100% { --ripple-r: var(--rmax, 240px); opacity: 0; }
+}
+html[data-platform='android'] [data-ripple]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--rx, 50%) var(--ry, 50%), color-mix(in srgb, currentColor 16%, transparent) var(--ripple-r), transparent calc(var(--ripple-r) + 1px));
+  animation: m3-ripple 520ms var(--ease-m3-std) forwards;
+}
+html[data-platform='android'] :is([data-ui='button'], [data-ui='chip'], [data-ui='sheet-action'], [data-ui='tab'], [data-ui='choice']) {
+  transition:
+    background-color 200ms var(--ease-m3-std),
+    box-shadow 200ms var(--ease-m3-std),
+    color 200ms var(--ease-m3-std);
+}
+html[data-platform='android'] [data-ui='button']:active,
+html[data-platform='android'] [data-ui='choice']:active,
+html[data-platform='android'] [data-ui='resume-bar']:active {
+  transform: none;
+}
+
+/* ── Navigationsleiste (80dp, Indikator-Pille) ── */
+html[data-platform='android'] [data-ui='tabbar'] {
+  border-top: 0;
+  background: var(--md-surface-container);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-platform='android'] [data-ui='tab'] {
+  height: 80px;
+  justify-content: flex-start;
+  padding-top: 12px;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+html[data-platform='android'] [data-ui='tab'][aria-current='page'] {
+  color: var(--text);
+  font-weight: 700;
+}
+html[data-platform='android'] [data-ui='tab-icon'] {
+  width: 64px;
+  height: 32px;
+  border-radius: 999px;
+}
+@media (hover: hover) {
+  html[data-platform='android'] [data-ui='tab']:hover [data-ui='tab-icon'] {
+    background: var(--md-state);
+  }
+}
+html[data-platform='android'] [data-ui='tab-indicator'] {
+  inset: 0;
+  border-radius: 999px;
+  background: var(--md-secondary-container);
+}
+html[data-platform='android'] [data-ui='tab'][aria-current='page'] [data-ui='tab-icon'] {
+  color: var(--md-on-secondary-container);
+}
+html[data-platform='android'] [data-ui='tab']::before {
+  display: none;
+}
+html[data-platform='android'] [data-ui='tab-icon'][data-ripple]::before {
+  border-radius: 999px;
+}
+html[data-platform='android'] .pb-nav {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+
+/* „Training läuft“ als Extended-FAB-artige Fläche, Pausentimer als Karte */
+html[data-platform='android'] [data-ui='bottom-bar'] > div:first-child {
+  padding-inline: 16px;
+}
+html[data-platform='android'] [data-ui='resume-bar'] {
+  height: 56px;
+  border-radius: 16px;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+  box-shadow: var(--md-elev-3);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+html[data-platform='android'] [data-ui='resume-dot'] span {
+  background: var(--md-on-primary-container);
+}
+html[data-platform='android'] [data-ui='resume-cta'] {
+  font-weight: 700;
+}
+html[data-platform='android'] [data-ui='rest-pill'] {
+  height: 52px;
+  border-radius: 16px;
+  border: 0;
+  background: var(--md-surface-container-high);
+  box-shadow: var(--md-elev-3);
+}
+html[data-platform='android'] [data-ui='rest-skip'] {
+  border-radius: 999px;
+  color: var(--primary);
+  font-weight: 600;
+}
+html[data-platform='android'] [data-ui='toast'] {
+  border-radius: 8px;
+  border: 0;
+  background: var(--text);
+  color: var(--bg);
+  box-shadow: var(--md-elev-3);
+}
+html[data-platform='android'] [data-ui='banner'] {
+  border-radius: 12px;
+  border: 0;
+  background: var(--md-surface-container-highest);
+  box-shadow: var(--md-elev-3);
+}
+
+/* ── Top App Bar ── */
+html[data-platform='android'] [data-ui='header'] {
+  background: var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: background-color 250ms var(--ease-m3-std);
+}
+html[data-platform='android'] [data-ui='header'][data-scrolled] {
+  background: var(--md-surface-container);
+}
+html[data-platform='android'] [data-ui='header-bar'] {
+  min-height: 64px;
+  padding-inline: 4px 8px;
+  gap: 4px;
+}
+html[data-platform='android'] [data-ui='header']:not([data-back]) [data-ui='header-bar'] {
+  padding-left: 16px;
+}
+html[data-platform='android'] [data-ui='header-back'] {
+  margin: 0;
+  width: 48px;
+  height: 48px;
+}
+html[data-platform='android'] [data-ui='header-title'] {
+  padding-left: 0;
+}
+html[data-platform='android'] [data-ui='header-title'] h1,
+html[data-platform='android'] [data-ui='header-collapsed-title'] {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 28px;
+}
+html[data-platform='android'] [data-ui='header-collapsed-title'] {
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 200ms var(--ease-m3-std),
+    translate 250ms var(--ease-m3-std);
+}
+html[data-platform='android'] [data-ui='header'][data-scrolled] [data-ui='header-collapsed-title'] {
+  opacity: 1;
+  translate: 0 0;
+}
+html[data-platform='android'] [data-ui='header'] [data-ui='button'][data-variant='ghost'] {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+}
+html[data-platform='android'] [data-ui='large-title'] {
+  padding: 4px 16px 20px;
+}
+html[data-platform='android'] [data-ui='large-title'] h1 {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 40px;
+}
+html[data-platform='android'] [data-ui='large-title'] p {
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+/* ── Buttons: Filled / Tonal / Outlined / Text ── */
+html[data-platform='android'] [data-ui='button'] {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+html[data-platform='android'] [data-ui='button'][data-size='icon'],
+html[data-platform='android'] [data-ui='button'][data-size='icon-sm'] {
+  border-radius: 999px;
+}
+html[data-platform='android'] [data-ui='button'][data-variant='primary']:hover {
+  filter: none;
+  box-shadow: var(--md-elev-1);
+}
+html[data-platform='android'] [data-ui='button'][data-variant='secondary'] {
+  border: 0;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+html[data-platform='android'] [data-ui='button'][data-variant='outline'] {
+  border-color: var(--md-outline);
+  color: var(--primary);
+}
+html[data-platform='android'] [data-ui='button'][data-variant='ghost']:not([data-size^='icon']) {
+  color: var(--primary);
+}
+html[data-platform='android'] [data-ui='button'][data-variant='danger'] {
+  border: 0;
+}
+html[data-platform='android'] [data-ui='button'][data-size='lg'] {
+  border-radius: 16px; /* großer Haupt-Button wie ein Extended FAB */
+  box-shadow: var(--md-elev-3);
+  height: 56px;
+}
+
+/* ── Karten, Eingaben, Chips ── */
+html[data-platform='android'] [data-ui='card'] {
+  border-color: transparent;
+}
+html[data-platform='android'] [data-ui='input'] {
+  border-radius: 12px;
+  background: transparent;
+  border-color: var(--md-outline);
+}
+html[data-platform='android'] [data-ui='input']:focus {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+html[data-platform='android'] [data-ui='chip'] {
+  height: 32px;
+  border-radius: 8px;
+  padding-inline: 14px;
+  background: transparent;
+  border-color: var(--md-outline);
+  color: var(--text);
+  font-weight: 500;
+}
+html[data-platform='android'] [data-ui='chip'][aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+html[data-platform='android'] [data-ui='row-icon'] {
+  border-radius: 999px;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+}
+html[data-platform='android'] [data-ui='choice'] {
+  border-radius: 16px;
+}
+html[data-platform='android'] [data-ui='badge'] {
+  border-radius: 8px;
+}
+
+/* Segmentierte Buttons (M3) */
+html[data-platform='android'] [data-ui='segmented'] {
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--md-outline);
+  border-radius: 999px;
+  overflow: hidden;
+}
+html[data-platform='android'] [data-ui='segmented'] > button {
+  border-radius: 0;
+  height: 40px;
+  font-weight: 500;
+  color: var(--text);
+}
+html[data-platform='android'] [data-ui='segmented'] > button + button {
+  border-left: 1px solid var(--md-outline);
+}
+html[data-platform='android'] [data-ui='segmented'] > button[aria-checked='true'] {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  background: var(--md-secondary-container);
+  color: var(--md-on-secondary-container);
+  box-shadow: none;
+}
+
+/* Tabs (M3 Primary Tabs mit Unterstrich) */
+html[data-platform='android'] [data-ui='tabs'] {
+  gap: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+}
+html[data-platform='android'] [data-ui='tab-trigger'] {
+  position: relative;
+  height: 48px;
+  border-radius: 0;
+  font-weight: 500;
+}
+html[data-platform='android'] [data-ui='tab-trigger'][data-state='active'] {
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  background: transparent;
+  color: var(--primary);
+  box-shadow: inset 0 -3px 0 var(--primary);
+}
+
+/* Schalter (M3) */
+html[data-platform='android'] [data-ui='switch'] {
+  width: 52px;
+  height: 32px;
+  border: 2px solid var(--md-outline);
+  background: var(--md-surface-container-highest);
+}
+html[data-platform='android'] [data-ui='switch'][data-state='checked'] {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+html[data-platform='android'] [data-ui='switch-thumb'] {
+  width: 16px;
+  height: 16px;
+  background: var(--md-outline);
+  translate: 6px 0;
+  box-shadow: none;
+  transition:
+    translate 250ms var(--ease-m3-std),
+    width 250ms var(--ease-m3-std),
+    height 250ms var(--ease-m3-std);
+}
+html[data-platform='android'] [data-ui='switch-thumb'][data-state='checked'] {
+  width: 24px;
+  height: 24px;
+  translate: 22px 0;
+  background: var(--primary-fg);
+}
+
+/* ── Bottom Sheet (M3) ── */
+html[data-platform='android'] [data-ui='sheet-overlay'] {
+  background: var(--md-scrim);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+html[data-platform='android'] [data-ui='sheet'] {
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--md-surface-container);
+  box-shadow: var(--md-elev-1);
+}
+html[data-platform='android'] [data-ui='sheet-handle'] {
+  width: 32px;
+  height: 4px;
+  margin-top: 22px;
+  margin-bottom: 4px;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+}
+html[data-platform='android'] [data-ui='sheet-header'] {
+  padding: 8px 12px 8px 24px;
+  align-items: center;
+}
+html[data-platform='android'] [data-ui='sheet-title'] {
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 28px;
+}
+html[data-platform='android'] [data-ui='sheet-close'] {
+  margin-right: 0;
+  width: 48px;
+  height: 48px;
+}
+html[data-platform='android'] [data-ui='sheet-sticky'] {
+  background: var(--md-surface-container);
+}
+html[data-platform='android'] [data-ui='sheet-action'] {
+  border-radius: 999px;
+  min-height: 56px;
+}
+html[data-platform='android'] [data-ui='sheet'] [data-ui='card'] {
+  background: var(--md-surface-container-high);
+}
+@keyframes m3-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes m3-sheet-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+@media (max-width: 639.98px) {
+  html[data-platform='android'] [data-ui='sheet'][data-state='open'] {
+    animation: m3-sheet-in 420ms var(--ease-m3);
+  }
+  html[data-platform='android'] [data-ui='sheet'][data-state='closed'] {
+    animation: m3-sheet-out 220ms cubic-bezier(0.3, 0, 0.8, 0.15) forwards;
+  }
+}
+@media (min-width: 640px) {
+  html[data-platform='android'] [data-ui='sheet'] {
+    border-radius: 28px;
+  }
+}

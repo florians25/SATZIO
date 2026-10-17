@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { beep, notify, vibrate } from './feedback';
+import { cancelRestNotification, scheduleRestNotification } from './native';
+import { isNative } from './platform';
 
 /**
  * PAUSENTIMER
@@ -8,6 +10,8 @@ import { beep, notify, vibrate } from './feedback';
  * bleibt bei Navigation korrekt und wird nach App-Neustart rekonstruiert.
  * Hinweis: Im Hintergrund (v. a. iOS) können Browser JavaScript pausieren;
  * Ton/Vibration/Benachrichtigung erfolgen dann beim nächsten Aktivwerden.
+ * In der nativen App plant das Betriebssystem eine lokale Benachrichtigung zur
+ * absoluten Endzeit – die kommt zuverlässig auch bei gesperrtem Gerät.
  */
 interface TimerState {
   endsAt: number | null;
@@ -49,6 +53,13 @@ export function setTimerPrefs(p: typeof prefs) {
 function armNotification(endsAt: number | null, label: string | null) {
   if (notifyTimeout) clearTimeout(notifyTimeout);
   notifyTimeout = null;
+  if (isNative()) {
+    // Native: OS-Benachrichtigung – immer geplant; die Erlaubnis wird beim ersten Timer
+    // erfragt und lässt sich in den System-Einstellungen widerrufen.
+    if (endsAt) void scheduleRestNotification(endsAt, label);
+    else void cancelRestNotification();
+    return;
+  }
   if (!endsAt) return;
   notifyTimeout = setTimeout(() => {
     if (document.visibilityState !== 'visible' && prefs.notifications) {

@@ -5,6 +5,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
   ({ className, ...props }, ref) => (
     <input
       ref={ref}
+      data-ui="input"
       className={cn(
         'h-12 w-full rounded-2xl border border-border bg-surface-2 px-4 text-base text-text placeholder:text-muted/70 outline-none transition focus:border-primary/70 focus:ring-2 focus:ring-primary/25 aria-[invalid=true]:border-error',
         className,
@@ -19,6 +20,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
   ({ className, ...props }, ref) => (
     <textarea
       ref={ref}
+      data-ui="input"
       className={cn(
         'min-h-28 w-full rounded-2xl border border-border bg-surface-2 px-4 py-3 text-base text-text placeholder:text-muted/70 outline-none transition focus:border-primary/70 focus:ring-2 focus:ring-primary/25',
         className,

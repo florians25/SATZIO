@@ -7,6 +7,7 @@ import { cn } from '@/lib/cn';
 import { useCoach } from '@/lib/coach';
 import { fmtClock } from '@/lib/format';
 import { useT } from '@/lib/i18n';
+import { platform } from '@/lib/platform';
 import { setTimerPrefs, useTimer, useTimerAlarm, useTimerRemaining } from '@/lib/timer';
 import { useActiveWorkouts } from '@/lib/workout';
 import { UpdatePrompt } from './UpdatePrompt';
@@ -37,45 +38,64 @@ export function AppShell() {
   return (
     <div className="mx-auto min-h-dvh max-w-2xl">
       <CoachToast />
-      <main className={cn('pb-nav', inWorkout && 'pb-safe')}>
+      <main data-ui="main" className={cn('pb-nav', inWorkout && 'pb-safe')}>
         <Outlet />
       </main>
       {!inWorkout && (
-        <div className="fixed inset-x-0 bottom-0 z-40">
+        <div data-ui="bottom-bar" className="fixed inset-x-0 bottom-0 z-40">
           <div className="mx-auto max-w-2xl px-3">
             <RestTimerPill />
             {current && (
               <Link
                 to={`/workout/${current.id}`}
-                className="mb-2 flex h-12 items-center gap-3 rounded-2xl bg-primary px-4 font-semibold text-primary-fg shadow-float active:scale-[0.99]"
+                data-ui="resume-bar"
+                className="glass mb-2 flex h-12 items-center gap-3 rounded-2xl bg-primary px-4 font-semibold text-primary-fg shadow-float active:scale-[0.99]"
               >
-                <span className="relative flex h-2.5 w-2.5">
+                <span className="relative flex h-2.5 w-2.5" data-ui="resume-dot">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-fg/50" />
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary-fg" />
                 </span>
                 <span className="flex-1 truncate">
                   {current.status === 'paused' ? 'Pausiert' : 'Training läuft'} · {current.name}
                 </span>
-                <span className="text-sm">Weiter →</span>
+                <span className="text-sm" data-ui="resume-cta">
+                  Weiter →
+                </span>
               </Link>
             )}
           </div>
-          <nav className="border-t border-border bg-bg/90 pb-safe backdrop-blur-xl" aria-label="Hauptnavigation">
+          {/* iOS: schwebende Liquid-Glass-Tab-Bar · Android: Material-3-Navigationsleiste · Web: klassisch */}
+          <nav data-ui="tabbar" className="glass border-t border-border bg-bg/90 pb-safe backdrop-blur-xl" aria-label="Hauptnavigation">
             <ul className="mx-auto flex max-w-2xl">
               {items.map(({ to, label, icon: Icon, end }) => (
                 <li key={to} className="flex-1">
                   <NavLink
                     to={to}
                     end={end}
+                    data-ui="tab"
                     className={({ isActive }) =>
                       cn(
-                        'flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium transition',
+                        'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium transition',
                         isActive ? 'text-primary' : 'text-muted hover:text-text',
                       )
                     }
                   >
-                    <Icon className="h-6 w-6" strokeWidth={2} aria-hidden />
-                    {label}
+                    {({ isActive }) => (
+                      <>
+                        {isActive && platform === 'ios' && (
+                          <motion.span layoutId="tab-lens" data-ui="tab-lens" className="absolute" transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.9 }} aria-hidden />
+                        )}
+                        <span data-ui="tab-icon" className="relative grid place-items-center">
+                          {isActive && platform === 'android' && (
+                            <motion.span layoutId="tab-indicator" data-ui="tab-indicator" className="absolute" transition={{ type: 'spring', stiffness: 600, damping: 42 }} aria-hidden />
+                          )}
+                          <Icon className="relative h-6 w-6" strokeWidth={isActive && platform !== 'web' ? 2.3 : 2} aria-hidden />
+                        </span>
+                        <span data-ui="tab-label" className="relative">
+                          {label}
+                        </span>
+                      </>
+                    )}
                   </NavLink>
                 </li>
               ))}
@@ -94,10 +114,10 @@ function RestTimerPill() {
   const skip = useTimer((s) => s.skip);
   if (remaining === null) return null;
   return (
-    <div className="mb-2 flex h-11 items-center gap-2 rounded-2xl border border-border bg-surface px-3 shadow-float">
+    <div data-ui="rest-pill" className="glass mb-2 flex h-11 items-center gap-2 rounded-2xl border border-border bg-surface px-3 shadow-float">
       <Timer className="h-4 w-4 text-primary" />
       <span className="flex-1 text-sm font-semibold tabular">Pause {fmtClock(remaining)}</span>
-      <button className="h-9 rounded-xl px-3 text-sm text-muted hover:bg-surface-2" onClick={skip}>
+      <button data-ui="rest-skip" className="h-9 rounded-xl px-3 text-sm text-muted hover:bg-surface-2" onClick={skip}>
         Überspringen
       </button>
     </div>
@@ -119,8 +139,10 @@ function CoachToast() {
             animate={{ y: 8, opacity: 1 }}
             exit={{ y: -40, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+            data-ui="toast"
+            data-tone={current.tone}
             className={cn(
-              'pointer-events-auto mx-4 max-w-sm rounded-full border px-4 py-2 text-sm font-semibold shadow-float backdrop-blur',
+              'glass pointer-events-auto mx-4 max-w-sm rounded-full border px-4 py-2 text-sm font-semibold shadow-float backdrop-blur',
               current.tone === 'highlight'
                 ? 'border-primary bg-primary text-primary-fg'
                 : current.tone === 'success'

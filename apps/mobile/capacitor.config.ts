@@ -35,6 +35,16 @@ const config: CapacitorConfig = {
       splashFullScreen: false,
       splashImmersive: false,
     },
+    LocalNotifications: {
+      // Monochromes Statusleisten-Icon (android/app/src/main/res/drawable/ic_stat_satzio.xml)
+      smallIcon: 'ic_stat_satzio',
+      iconColor: '#B7FF3C',
+    },
+    Keyboard: {
+      // iOS: WebView wird nativ verkleinert, keine Zubehörleiste über der Tastatur
+      resize: 'native',
+      resizeOnFullScreen: true,
+    },
     StatusBar: {
       // "DARK" = helle Schrift für dunklen Hintergrund
       style: 'DARK',

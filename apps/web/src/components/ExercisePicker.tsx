@@ -74,7 +74,7 @@ export function ExercisePicker({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange} title={title} className="h-[92dvh]">
-      <div className="sticky top-0 z-10 -mx-5 space-y-2 bg-surface px-5 pb-2">
+      <div data-ui="sheet-sticky" className="sticky top-0 z-10 -mx-5 space-y-2 bg-surface px-5 pb-2">
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Übung suchen …" className="pl-11" autoFocus={false} aria-label="Übung suchen" />
@@ -138,6 +138,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       type="button"
       onClick={onClick}
       aria-pressed={active}
+      data-ui="chip"
       className={cn(
         'flex h-9 shrink-0 items-center gap-1 rounded-full border px-3 text-sm font-medium transition',
         active ? 'border-primary bg-primary text-primary-fg' : 'border-border bg-surface-2 text-muted',

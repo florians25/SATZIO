@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/web-KlyxwWrl.js","assets/index-DZD9rn8u.js"])))=>i.map(i=>d[i]);
+import{as as r}from"./index-CEwaq4CV.js";import{r as o}from"./index-DZD9rn8u.js";import"./data-CK6Tr_-o.js";import"./react-Bik-GMVl.js";import"./charts-ROIOCDrI.js";const _=o("KeepAwake",{web:()=>r(()=>import("./web-KlyxwWrl.js"),__vite__mapDeps([0,1])).then(e=>new e.KeepAwakeWeb)});export{_ as KeepAwake};

@@ -6,6 +6,11 @@ import type {
   ExercisePerformance,
   ExerciseProgressPoint,
   ExerciseView,
+  FriendCodeView,
+  FriendsOverview,
+  InviteListItem,
+  InviteLiveView,
+  InviteView,
   MetaView,
   MuscleGroupStat,
   PersonalRecordView,
@@ -183,4 +188,46 @@ export function useUpdateSettings() {
 export function useInvalidate() {
   const qc = useQueryClient();
   return (...keys: readonly unknown[][]) => Promise.all(keys.map((k) => qc.invalidateQueries({ queryKey: k })));
+}
+
+/* ───────────────────────────── Soziales: Freunde & gemeinsames Training ───────────────────────────── */
+
+export const socialKeys = {
+  friends: ['friends'] as const,
+  friendCode: ['friend-code'] as const,
+  invites: ['invites'] as const,
+  invite: (id: string) => ['invite', id] as const,
+  live: (id: string) => ['invite-live', id] as const,
+  forSession: (sessionId: string) => ['invite-for-session', sessionId] as const,
+  join: (token: string) => ['invite-join', token] as const,
+};
+
+export function useFriends() {
+  return useQuery({ queryKey: socialKeys.friends, queryFn: () => api<FriendsOverview>('/friends'), staleTime: 10_000, refetchOnMount: 'always' });
+}
+
+export function useFriendCode(enabled = true) {
+  return useQuery({ queryKey: socialKeys.friendCode, queryFn: () => api<FriendCodeView>('/friends/code'), enabled, staleTime: Infinity });
+}
+
+export function useInvites() {
+  return useQuery({ queryKey: socialKeys.invites, queryFn: () => api<InviteListItem[]>('/invites'), staleTime: 10_000, refetchOnMount: 'always' });
+}
+
+export function useInvite(id: string | undefined) {
+  return useQuery({ queryKey: socialKeys.invite(id ?? ''), enabled: !!id, queryFn: () => api<InviteView>(`/invites/${id}`) });
+}
+
+/** Live-Fortschritt der Gruppe – alle 5 s, nur solange die Seite sichtbar ist. */
+export function useInviteLive(id: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: socialKeys.live(id ?? ''),
+    enabled: !!id && enabled,
+    queryFn: () => api<InviteLiveView>(`/invites/${id}/live`),
+    refetchInterval: (q) => (q.state.error ? false : 5_000),
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+    staleTime: 2_000,
+    retry: false,
+  });
 }

@@ -88,6 +88,8 @@ export const settingsUpdateSchema = z
     progressionEnabled: z.boolean(),
     gamificationEnabled: z.boolean(),
     workoutMode: z.enum(WORKOUT_MODES),
+    allowFriendRequests: z.boolean(),
+    shareActivityWithFriends: z.boolean(),
   })
   .partial();
 export type SettingsUpdateInput = z.infer<typeof settingsUpdateSchema>;

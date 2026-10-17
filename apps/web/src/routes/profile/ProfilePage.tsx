@@ -1,14 +1,14 @@
 import { GOAL_LABELS_DE, LEVEL_LABELS_DE, type UserView } from '@satzio/shared';
-import { Award, Camera, ChevronRight, Database, LogOut, Scale, Settings, Shield, UserCog } from 'lucide-react';
+import { Award, Camera, ChevronRight, Database, LogOut, Scale, Settings, Shield, UserCog, Users } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/PageHeader';
-import { Card } from '@/components/ui/card';
+import { Badge, Card } from '@/components/ui/card';
 import { ListRow } from '@/components/ui/controls';
 import { ConfirmSheet } from '@/components/ui/sheet';
 import { api, errorMessage } from '@/lib/api';
 import { pendingChangesCount, useAuth } from '@/lib/auth';
-import { useAchievements, useAnalyticsOverview } from '@/lib/queries';
+import { useAchievements, useAnalyticsOverview, useFriends } from '@/lib/queries';
 import { EditProfileSheet } from './EditProfileSheet';
 
 export default function ProfilePage() {
@@ -17,6 +17,8 @@ export default function ProfilePage() {
   const logout = useAuth((s) => s.logout);
   const ov = useAnalyticsOverview('all');
   const ach = useAchievements();
+  const friends = useFriends();
+  const friendRequests = friends.data?.incoming.length ?? 0;
   const fileRef = useRef<HTMLInputElement>(null);
   const [edit, setEdit] = useState(false);
   const [logoutWarn, setLogoutWarn] = useState<number | null>(null);
@@ -79,6 +81,18 @@ export default function ProfilePage() {
         </div>
         <Card className="divide-y divide-border overflow-hidden">
           <ListRow icon={<UserCog />} title="Profil & Trainingsziel" subtitle="Ziel, Level, Trainingstage, Körperdaten" onClick={() => setEdit(true)} right={<ChevronRight className="h-5 w-5 text-muted" />} />
+          <ListRow
+            icon={<Users />}
+            title="Freunde"
+            subtitle={friends.data ? `${friends.data.friends.length} Freunde · gemeinsam trainieren` : 'Gemeinsam trainieren'}
+            to="/social?tab=friends"
+            right={
+              <span className="flex items-center gap-2">
+                {friendRequests > 0 && <Badge tone="primary" aria-label={`${friendRequests} offene Anfragen`}>{friendRequests}</Badge>}
+                <ChevronRight className="h-5 w-5 text-muted" />
+              </span>
+            }
+          />
           <ListRow icon={<Settings />} title="Einstellungen" subtitle="Einheit, Pausentimer, Motivation, Darstellung" to="/profile/settings" right={<ChevronRight className="h-5 w-5 text-muted" />} />
           {user.settings.gamificationEnabled && <ListRow icon={<Award />} title="Erfolge" subtitle={`${unlocked} freigeschaltet`} to="/profile/achievements" right={<ChevronRight className="h-5 w-5 text-muted" />} />}
           <ListRow icon={<Scale />} title="Körpergewicht & Maße" to="/profile/body" right={<ChevronRight className="h-5 w-5 text-muted" />} />

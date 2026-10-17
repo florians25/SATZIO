@@ -17,10 +17,14 @@
     "ios:vendor": "node scripts/vendor-ios.mjs"
   },
   "dependencies": {
+    "@capacitor-community/keep-awake": "7.1.0",
     "@capacitor/android": "7.6.9",
+    "@capacitor/app": "7.1.2",
     "@capacitor/core": "7.6.9",
     "@capacitor/haptics": "7.0.5",
     "@capacitor/ios": "7.6.9",
+    "@capacitor/keyboard": "7.0.6",
+    "@capacitor/local-notifications": "7.0.7",
     "@capacitor/preferences": "7.0.4",
     "@capacitor/splash-screen": "7.0.5",
     "@capacitor/status-bar": "7.0.6"

@@ -1,5 +1,22 @@
-/** Haptisches & akustisches Feedback – nur, wenn vom Gerät unterstützt und aktiviert. */
+import { hapticImpact, hapticSuccess, requestNativeNotificationPermission } from './native';
+import { isNative } from './platform';
+
+/**
+ * Haptisches & akustisches Feedback – nur, wenn vom Gerät unterstützt und aktiviert.
+ * In der nativen App echte Taptic-Engine/Android-Haptik statt navigator.vibrate
+ * (das es in iOS Safari gar nicht gibt): kurze Impulse → Impact, Muster → Erfolgs-Haptik.
+ */
 export function vibrate(pattern: number | number[] = 12) {
+  if (isNative()) {
+    if (Array.isArray(pattern)) {
+      const total = pattern.reduce((a, b) => a + b, 0);
+      if (total >= 300) hapticImpact('heavy');
+      hapticSuccess();
+    } else {
+      hapticImpact(pattern >= 40 ? 'heavy' : pattern >= 20 ? 'medium' : 'light');
+    }
+    return;
+  }
   try {
     if ('vibrate' in navigator) navigator.vibrate(pattern);
   } catch {
@@ -56,6 +73,7 @@ export async function notify(title: string, body: string) {
 }
 
 export async function requestNotificationPermission(): Promise<NotificationPermission | 'unsupported'> {
+  if (isNative()) return requestNativeNotificationPermission();
   if (!('Notification' in window)) return 'unsupported';
   if (Notification.permission !== 'default') return Notification.permission;
   return Notification.requestPermission();

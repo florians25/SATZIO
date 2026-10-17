@@ -32,4 +32,13 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Pausentimer: lokale Benachrichtigung zur exakten Endzeit (auch bei gesperrtem Gerät).
+         POST_NOTIFICATIONS (Android 13+), WAKE_LOCK und RECEIVE_BOOT_COMPLETED bringt
+         @capacitor/local-notifications per Manifest-Merge mit; Abfrage erfolgt beim ersten Timer.
+         SCHEDULE_EXACT_ALARM statt USE_EXACT_ALARM (Letzteres ist laut Play-Richtlinie Wecker-/Kalender-Apps vorbehalten);
+         ohne Freigabe fällt das Plugin auf setAndAllowWhileIdle zurück. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Display während des Trainings anlassen (@capacitor-community/keep-awake) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 </manifest>

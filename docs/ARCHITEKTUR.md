@@ -29,6 +29,7 @@ UUID-Schlüssel, `createdAt`/`updatedAt`, Gewichte intern in **kg** als `Decimal
 | Trainings | `WorkoutSession`, `WorkoutSessionExercise` (**Schnappschuss** von Name/Muskel/Zielwerten), `WorkoutSet` (inkl. Ziel-Schnappschuss und Herkunft der Vorbelegung) |
 | Auswertung | `PersonalRecord` (eindeutig je Nutzer/Übung/Rekordschlüssel), `BodyWeightEntry`, `Achievement`, `UserAchievement` |
 | Sync | `SyncOperation` (eindeutig je Nutzer + opId) |
+| Soziales | `Friendship` (Anfrage/Freundschaft, je Paar eine Zeile), `UserInviteCode` (persönlicher, erneuerbarer Einladungscode), `TrainingInvite` (gemeinsames Training, optional Schnappschuss eines Plan-Tags ohne Gewichte, Teilen-Token), `TrainingInviteParticipant` (Status inkl. Gastgeber, verknüpftes Training, `SetNull` beim Löschen) |
 
 Plan-Sätze (`PlannedSet`) und tatsächliche Sätze (`WorkoutSet`) sind getrennt. Historische Trainings speichern ihre Werte selbst – spätere Plan- oder Übungsänderungen verändern sie nicht.
 
@@ -41,6 +42,14 @@ Plan-Sätze (`PlannedSet`) und tatsächliche Sätze (`WorkoutSet`) sind getrennt
 5. **Konfliktstrategie:** Jede Entität hat `version` und `lastDeviceId`. Konflikt, wenn `version > baseVersion` **und** die letzte Änderung von einem **anderen Gerät** stammt. Dann wird nichts angewendet; der Client erhält den Serverstand, markiert die Operation als Konflikt und zeigt beide Werte an („Meine Änderung behalten“ → erneut mit aktueller Basisversion senden, „Andere übernehmen“). Aufeinanderfolgende Änderungen desselben Geräts sind nie ein Konflikt. Reihenfolge-Änderungen von Übungen sind bewusst „last write wins“.
 6. Zusammenführen: Noch **nie gesendete** Patches derselben Entität werden in der Outbox zusammengefasst; bereits versuchte Operationen werden nie verändert (Idempotenz bleibt korrekt).
 7. Pläne werden per Auto-Save (`PUT /plans/:id`, entprellt) gespeichert; ungespeicherte Entwürfe liegen in IndexedDB und werden bei Verbindung nachgereicht. Lesedaten (Heute, Pläne, Übungen, Leistungsdaten) werden aus dem persistierten Query-Cache auch offline angezeigt.
+
+## Freunde & gemeinsames Training
+
+- **Freunde finden:** nur per exaktem Benutzernamen (Groß-/Kleinschreibung egal, keine Teiltreffer) oder per persönlichem Link `<PUBLIC_URL>/friends/add/<code>` (Code jederzeit neu erzeugbar → alter Link ungültig). Ein vor dem Login geöffneter Link wird gemerkt und nach Anmeldung/Registrierung verarbeitet. Anfragen sind gedrosselt (20/min).
+- **Privatsphäre** (`UserSettings`): `allowFriendRequests` (Standard an; aus = keine Anfragen per Benutzername, der eigene Link funktioniert weiter), `shareActivityWithFriends` (Standard aus; an = Freunde sehen letztes Trainingsdatum + Serie). Abgelehnte Anfragen bleiben für den Absender „ausstehend“ und können nicht erneut gestellt werden.
+- **Einladungen:** nur bestätigte Freunde. Lesen nur für Gastgeber/Eingeladene (sonst 404), Live-Daten nur für Zusagen (sonst 403). Live (`GET /invites/:id/live`, Polling 5 s) zeigt nur aktuelle Übung, Satzanzahl, letzten Satz und Status; Volumen erst nach Abschluss.
+- **Verknüpfung Training ↔ Einladung:** Trainings entstehen offline; `POST /invites/:id/link` liefert `404 SESSION_NOT_SYNCED`, bis die Sync-Engine das Training hochgeladen hat. Die App merkt sich ausstehende Verknüpfungen in IndexedDB (`kv`) und wiederholt mit Backoff.
+- **Teilen-Link** `/invites/join/<token>`: auch Nicht-Freunde sehen (nach Login) Titel, Zeit, Ort, Gastgeber und können die Teilnahme anfragen; der Gastgeber bestätigt oder lehnt ab. Erst danach sind Details und Workout sichtbar.
 
 ## Rekorde
 

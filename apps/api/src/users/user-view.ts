@@ -49,6 +49,8 @@ export async function loadUserView(prisma: PrismaService, userId: string): Promi
       progressionEnabled: settings.progressionEnabled,
       gamificationEnabled: settings.gamificationEnabled,
       workoutMode: settings.workoutMode,
+      allowFriendRequests: settings.allowFriendRequests,
+      shareActivityWithFriends: settings.shareActivityWithFriends,
     },
   };
 }

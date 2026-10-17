@@ -80,6 +80,7 @@ export class DataService {
     ]);
     const plans = [];
     for (const p of planList) plans.push(await this.plans.exportShared(userId, p.id));
+    const social = await this.exportSocial(userId);
     return {
       format: 'satzio-export' as const,
       version: 1 as const,
@@ -132,6 +133,46 @@ export class DataService {
         notes: b.notes,
       })),
       achievements: achievements.map((a) => ({ code: a.achievement.code, title: a.achievement.title, unlockedAt: a.unlockedAt.toISOString() })),
+      ...social,
+    };
+  }
+
+  /** Soziale Daten: Freunde (nur Benutzernamen) und eigene bzw. erhaltene Trainingseinladungen. */
+  private async exportSocial(userId: string) {
+    const [friendships, participations] = await Promise.all([
+      this.prisma.friendship.findMany({
+        where: { OR: [{ requesterId: userId }, { addresseeId: userId }] },
+        include: { requester: { select: { username: true } }, addressee: { select: { username: true } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.trainingInviteParticipant.findMany({
+        where: { userId },
+        include: { invite: { include: { host: { select: { username: true } } } } },
+        orderBy: { createdAt: 'asc' },
+      }),
+    ]);
+    return {
+      friends: friendships.map((f) => {
+        const outgoing = f.requesterId === userId;
+        return {
+          username: outgoing ? f.addressee.username : f.requester.username,
+          status: f.status,
+          direction: outgoing ? 'sent' : 'received',
+          createdAt: f.createdAt.toISOString(),
+          respondedAt: f.respondedAt?.toISOString() ?? null,
+        };
+      }),
+      trainingInvites: participations.map((p) => ({
+        title: p.invite.title,
+        startsAt: p.invite.startsAt.toISOString(),
+        location: p.invite.location,
+        note: p.invite.note,
+        host: p.invite.host.username,
+        isHost: p.invite.hostId === userId,
+        inviteStatus: p.invite.status,
+        myStatus: p.status,
+        linkedWorkout: !!p.sessionId,
+      })),
     };
   }
 

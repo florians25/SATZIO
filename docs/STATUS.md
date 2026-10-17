@@ -20,12 +20,19 @@
 - Docker Compose (Website `/`, Web-App `/app/`, API, PostgreSQL), Setup-, Backup-, Restore-Skripte, CI
 - Capacitor-Projekte Android & iOS; APK und iOS-Simulator-Build per GitHub Actions gebaut
 - Produktwebsite
+- **Freunde & Gruppentraining**: Freunde per Benutzername oder persönlichem Link, Trainingseinladungen mit Termin/Ort/Plan-Tag, Zusagen, Beitrittslink mit Freigabe durch den Gastgeber, Live-Fortschritt der Gruppe im laufenden Training, Privatsphäre-Einstellungen
+- **Plattform-Design**: iOS im Liquid-Glass-Stil, Android in Material 3, native Funktionen in den Apps (Haptik, Pausen-Benachrichtigung, Bildschirm bleibt an, Statusleiste, Android-Zurück-Taste, Tastatur)
+- **Eingabe**: eigene Zahlentastatur, Wiederholungs-Chips, Scheibenrechner, Wischgesten, Long-Press
+- `scripts/update.sh`: Backup → `git pull` → Images bauen → Neustart → Healthcheck
 
 ## Bekannte Einschränkungen
 
+- **Native Apps auf echten Geräten**: Liquid Glass/Material 3 und die nativen Plugins wurden im Browser (Screenshots) und per `cap sync` geprüft, aber nicht auf echten Geräten. Systemschriften (SF/Roboto) fehlen in den Linux-Screenshots.
+- **Gruppentraining**: kein QR-Code, keine Blockier-Funktion; Live-Ansicht aktualisiert per Polling alle 5 s (kein WebSocket).
+
 - **iOS**: Das Xcode-Projekt kompiliert in GitHub Actions (Simulator, unsigniert). Signierte Builds, Geräte-Tests und App-Store/TestFlight erfordern ein Apple-Developer-Konto und wurden **nicht** durchgeführt.
 - **Android-APK lokal**: In der Entwicklungsumgebung war `dl.google.com` (Android-SDK/Google-Maven) gesperrt; das APK wird daher über GitHub Actions gebaut. Das CI-APK ist ein **Debug-Build** (nicht für den Play Store signiert) und verbindet sich mit `https://satzio.netfusion-service.de`.
-- **Hintergrund-Timer**: Browser (v. a. iOS) pausieren JavaScript im Hintergrund. Der Timer bleibt korrekt (absolute Endzeit), das Signal kommt ggf. erst beim Zurückkehren. Native lokale Benachrichtigungen sind in den Capacitor-Apps noch nicht eingebaut.
+- **Hintergrund-Timer**: Browser (v. a. iOS) pausieren JavaScript im Hintergrund. Im Browser bleibt der Timer korrekt (absolute Endzeit), das Signal kommt ggf. erst beim Zurückkehren. In den Apps kommt eine native lokale Benachrichtigung – auf echten Geräten noch nicht getestet.
 - **Englisch**: Architektur vorhanden (`apps/web/src/lib/i18n.ts`), übersetzt sind Navigation und Kernbegriffe; die meisten Texte sind deutsch.
 - **Übungsfotos**: Für die Bibliothek gibt es keine Fotos/Videos, sondern eine schematische Muskelkarte (gekennzeichnet). Eigene Bilder sind möglich.
 - **Tausch zweier Termine** im festen Wochenplan ist in der Logik umgesetzt und getestet, in der Oberfläche gibt es „verpasste Einheit auf heute verschieben“ und die Wochentagszuordnung, aber noch keinen eigenen Tausch-Dialog.
@@ -38,5 +45,5 @@
 
 1. Deployment auf `satzio.netfusion-service.de` (Reverse Proxy + TLS, `./scripts/setup.sh satzio.netfusion-service.de`), SMTP eintragen
 2. Release-Signierung für Android (Keystore als GitHub-Secret) und iOS (Apple-Team) in den Workflow aufnehmen
-3. Native lokale Benachrichtigungen für den Pausentimer (`@capacitor/local-notifications`)
+3. Native Funktionen und Plattform-Design auf echten iPhones/Android-Geräten prüfen
 4. Vollständige englische Übersetzung

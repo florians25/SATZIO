@@ -17,7 +17,9 @@ import { fmtClock, fmtDate } from '@/lib/format';
 import { useT } from '@/lib/i18n';
 import { useExerciseMap, usePerformance, useUpdateSettings } from '@/lib/queries';
 import { useTimer } from '@/lib/timer';
+import { useActiveInviteForSession } from '@/lib/social';
 import { flushWrites, useWorkout } from '@/lib/workout';
+import { GroupLivePanel } from '../social/GroupLivePanel';
 import { useSetToggle } from './completion';
 import { ExerciseBlock } from './ExerciseBlock';
 import { ExerciseSheet } from './ExerciseSheet';
@@ -51,6 +53,7 @@ export default function WorkoutPage() {
   const exerciseMap = useExerciseMap();
   const updateSettings = useUpdateSettings();
   const onToggle = useSetToggle();
+  const inviteId = useActiveInviteForSession(sessionId);
   const qc = useQueryClient();
 
   const [mode, setMode] = useState(settings.workoutMode);
@@ -176,6 +179,11 @@ export default function WorkoutPage() {
       )}
 
       <div className="pb-40 pt-3">
+        {inviteId && (
+          <div className="px-3 pb-3">
+            <GroupLivePanel inviteId={inviteId} />
+          </div>
+        )}
         {mode === 'guided' && !completed ? (
           <GuidedView unit={settings.unit} stepsKg={settings.weightStepsKg} performance={performance} exerciseMap={exerciseMap} onToggle={toggle} onFinish={() => setFinishOpen(true)} />
         ) : (

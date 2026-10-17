@@ -14,6 +14,7 @@ import { MailModule } from './mail/mail.module';
 import { MetaModule } from './meta/meta.controller';
 import { PlansModule } from './plans/plans.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SocialModule } from './social/social.module';
 import { SyncModule } from './sync/sync.module';
 import { UsersModule } from './users/users.module';
 import { WorkoutsModule } from './workouts/workouts.module';
@@ -36,6 +37,7 @@ import { WorkoutsModule } from './workouts/workouts.module';
     AchievementsModule,
     MetaModule,
     AssistantModule,
+    SocialModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

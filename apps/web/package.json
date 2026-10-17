@@ -13,6 +13,13 @@
     "icons": "python3 scripts/make-icons.py"
   },
   "dependencies": {
+    "@capacitor-community/keep-awake": "7.1.0",
+    "@capacitor/app": "7.1.2",
+    "@capacitor/core": "7.6.9",
+    "@capacitor/haptics": "7.0.5",
+    "@capacitor/keyboard": "7.0.6",
+    "@capacitor/local-notifications": "7.0.7",
+    "@capacitor/status-bar": "7.0.6",
     "@fontsource-variable/inter": "5.2.6",
     "@hookform/resolvers": "5.2.2",
     "@radix-ui/react-dialog": "1.1.15",
