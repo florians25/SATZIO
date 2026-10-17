@@ -2,13 +2,17 @@ import { expect, type Page } from '@playwright/test';
 
 export const PASSWORD = 'Sicher123';
 
+/** Pfad der Web-App (Docker: '/app', Vite-Preview: ''). Per E2E_APP_PATH steuerbar. */
+export const APP_PATH = process.env.E2E_APP_PATH ?? '';
+export const app = (path: string) => `${APP_PATH}${path}`;
+
 export function uniqueUser(prefix = 'e2e') {
   const id = `${prefix}${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`;
   return { username: id, email: `${id}@example.com`, password: PASSWORD };
 }
 
 export async function register(page: Page, user: ReturnType<typeof uniqueUser>) {
-  await page.goto('/');
+  await page.goto(app('/'));
   await expect(page.getByText('Dein nächstes Level beginnt hier.')).toBeVisible();
   await page.getByRole('link', { name: 'Kostenlos registrieren' }).click();
   await page.getByLabel('Benutzername').fill(user.username);

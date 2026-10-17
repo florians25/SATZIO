@@ -90,9 +90,9 @@ export SATZIO_API_URL=https://satzio.meine-domain.de
 pnpm --filter @satzio/mobile build:web
 ```
 
-Ohne `SATZIO_API_URL` wird der Platzhalter `https://satzio.example.com` verwendet –
-eine so gebaute App kann sich **nirgends** anmelden. Jede:r Betreiber:in muss die
-App also mit der eigenen Server-URL bauen.
+Ohne `SATZIO_API_URL` verbindet sich die App mit dem Standardserver
+`https://satzio.netfusion-service.de` (API unter `/api/v1`). Wer einen eigenen Server
+betreibt, baut die App mit der eigenen URL.
 
 Serverseitig muss die API die Origins `capacitor://localhost` (iOS) und
 `https://localhost` (Android) per CORS erlauben (ist in SATZIO bereits so
@@ -278,7 +278,7 @@ In Xcode:
 Erledigt:
 
 - `package.json`, `capacitor.config.ts`, Abhängigkeiten installiert (pnpm-Workspace)
-- Web-Build mit `VITE_API_URL=https://satzio.example.com` erzeugt
+- Web-Build mit `VITE_API_URL=https://satzio.netfusion-service.de` erzeugt
 - `npx cap add android`, `npx cap add ios --packagemanager SPM`, `npx cap sync`
 - Icons und Splash-Screens für Android und iOS mit `@capacitor/assets` generiert
   (Hintergrund `#0B0F0E`)

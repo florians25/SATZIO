@@ -1,11 +1,22 @@
 # Produktivbetrieb
 
+Zieladresse: **https://satzio.netfusion-service.de**
+
+| Pfad | Inhalt |
+|---|---|
+| `/` | Produktwebsite (`apps/website`) |
+| `/app/` | Web-App / PWA (installierbar) |
+| `/api/v1/…` | REST-API – auch für die Android- und iOS-App |
+| `/api/docs` | API-Dokumentation |
+
+Alles läuft über den `web`-Container (nginx) auf Port 8080; ein Reverse Proxy mit TLS steht davor.
+
 ## 1. Domain & PUBLIC_URL
 
-In `.env`:
+Schnellweg: `./scripts/setup.sh satzio.netfusion-service.de` setzt `PUBLIC_URL` und bindet den Web-Container nur an 127.0.0.1. Manuell in `.env`:
 
 ```env
-PUBLIC_URL=https://satzio.example.com   # exakt die Adresse, unter der Nutzer die App öffnen
+PUBLIC_URL=https://satzio.netfusion-service.de/app   # Adresse der Web-App (Website liegt unter /)
 WEB_BIND=127.0.0.1                      # Web-Container nur lokal binden, wenn ein Reverse Proxy davor sitzt
 WEB_PORT=8080
 ```
@@ -19,7 +30,7 @@ SATZIO selbst spricht HTTP auf Port 8080. TLS übernimmt ein vorgeschalteter Rev
 **Caddy** (automatische Let’s-Encrypt-Zertifikate):
 
 ```caddyfile
-satzio.example.com {
+satzio.netfusion-service.de {
   encode zstd gzip
   reverse_proxy 127.0.0.1:8080
 }
@@ -30,9 +41,9 @@ satzio.example.com {
 ```nginx
 server {
   listen 443 ssl http2;
-  server_name satzio.example.com;
-  ssl_certificate     /etc/letsencrypt/live/satzio.example.com/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/satzio.example.com/privkey.pem;
+  server_name satzio.netfusion-service.de;
+  ssl_certificate     /etc/letsencrypt/live/satzio.netfusion-service.de/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/satzio.netfusion-service.de/privkey.pem;
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
   client_max_body_size 25m;
   location / {
@@ -42,7 +53,7 @@ server {
     proxy_set_header X-Forwarded-Proto https;
   }
 }
-server { listen 80; server_name satzio.example.com; return 301 https://$host$request_uri; }
+server { listen 80; server_name satzio.netfusion-service.de; return 301 https://$host$request_uri; }
 ```
 
 Die API vertraut genau einem Proxy-Hop (`trust proxy 1`) für Rate-Limiting nach Client-IP.
@@ -103,7 +114,7 @@ Migrationen werden beim Start der API reproduzierbar angewendet (`prisma migrate
 ```bash
 docker compose ps                 # Healthchecks aller Dienste
 docker compose logs -f api web    # Logs
-curl -fsS https://satzio.example.com/api/v1/health   # für Uptime-Monitoring (prüft auch die DB)
+curl -fsS https://satzio.netfusion-service.de/api/v1/health   # für Uptime-Monitoring (prüft auch die DB)
 ```
 
 - API-Logs enthalten Methode, Pfad, Status, Dauer und Request-ID – keine Bodies, Query-Strings, IP-Adressen oder E-Mail-Adressen.

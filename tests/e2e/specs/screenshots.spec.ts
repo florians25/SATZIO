@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { onboarding, register, uniqueUser, waitForSync } from './helpers';
+import { app } from './helpers';
 
 /** Erzeugt Screenshots für die Dokumentation (docs/screenshots). Nur mit SCREENSHOTS=1. */
 test.skip(!process.env.SCREENSHOTS, 'Nur zur Doku-Erstellung');
@@ -7,7 +8,7 @@ test.skip(!process.env.SCREENSHOTS, 'Nur zur Doku-Erstellung');
 const out = (n: string) => `../../docs/screenshots/${n}.png`;
 
 test('Screenshots der Kernbildschirme', async ({ page }) => {
-  await page.goto('/');
+  await page.goto(app('/'));
   await expect(page.getByText('Dein nächstes Level beginnt hier.')).toBeVisible();
   await page.screenshot({ path: out('01-willkommen') });
   const user = uniqueUser('shot');
@@ -42,15 +43,15 @@ test('Screenshots der Kernbildschirme', async ({ page }) => {
   await waitForSync(page);
   await expect(page.getByText('Neue Rekorde')).toBeVisible();
   await page.screenshot({ path: out('06-zusammenfassung') });
-  await page.goto('/plans/import');
+  await page.goto(app('/plans/import'));
   await page.getByRole('button', { name: 'Beispiel einfügen' }).click();
   await page.getByRole('button', { name: 'Erkennen' }).click();
   await page.screenshot({ path: out('07-notizen-import') });
-  await page.goto('/progress');
+  await page.goto(app('/progress'));
   await page.getByRole('tab', { name: 'Übungen' }).click();
   await page.waitForTimeout(500);
   await page.screenshot({ path: out('08-fortschritt') });
-  await page.goto('/exercises');
+  await page.goto(app('/exercises'));
   await expect(page.getByText('Bankdrücken').first()).toBeVisible();
   await page.screenshot({ path: out('09-uebungen') });
   await page.getByText('Bankdrücken').first().click();

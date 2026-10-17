@@ -6,8 +6,11 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const apiTarget = process.env.VITE_API_PROXY ?? 'http://localhost:3000';
+/** Basis-Pfad der App: '/' (Entwicklung, Capacitor) oder '/app/' (Docker: Website unter '/'). */
+const base = process.env.VITE_BASE ?? '/';
 
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -20,24 +23,24 @@ export default defineConfig({
         short_name: 'SATZIO',
         description: 'Fitness-Tracking so einfach wie eine Notizen-App.',
         lang: 'de',
-        start_url: '/',
-        scope: '/',
+        start_url: '.',
+        scope: '.',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#0B0F0E',
         theme_color: '#0B0F0E',
         categories: ['health', 'fitness', 'sports'],
         icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
-        shortcuts: [{ name: 'Heutiges Training', short_name: 'Heute', url: '/' }],
+        shortcuts: [{ name: 'Heutiges Training', short_name: 'Heute', url: '.' }],
       },
       workbox: {
         // App-Shell offline; API-Daten werden über IndexedDB (Dexie) gecacht
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
-        navigateFallback: '/index.html',
+        navigateFallback: `${base}index.html`,
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
         // Beim ersten Besuch sofort offline-fähig; Updates warten auf Bestätigung (kein Reload mitten im Training)

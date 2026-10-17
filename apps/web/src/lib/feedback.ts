@@ -48,8 +48,8 @@ export async function notify(title: string, body: string) {
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
     const reg = await navigator.serviceWorker?.getRegistration();
-    if (reg) await reg.showNotification(title, { body, icon: '/icons/icon-192.png', tag: 'satzio-rest', silent: false });
-    else new Notification(title, { body, icon: '/icons/icon-192.png' });
+    if (reg) await reg.showNotification(title, { body, icon: `${import.meta.env.BASE_URL}icons/icon-192.png`, tag: 'satzio-rest', silent: false });
+    else new Notification(title, { body, icon: `${import.meta.env.BASE_URL}icons/icon-192.png` });
   } catch {
     /* nicht unterstützt */
   }

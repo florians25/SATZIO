@@ -2,7 +2,7 @@
 
 // Ziel des Buttons „Web-App öffnen“. Einzige Stelle, die angepasst werden muss.
 // Beispiele: '/app/' (gleiche Domain), 'https://app.example.de/', 'http://localhost:8080'
-// Wird im Docker-Image per Build-Argument APP_URL ersetzt (Standard: http://localhost:8080)
+// Web-App liegt auf derselben Domain unter /app/ (siehe docker/nginx.conf)
 const APP_URL = '/app/';
 
 document.querySelectorAll('[data-app-link]').forEach((a) => {

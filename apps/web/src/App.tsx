@@ -72,7 +72,7 @@ export function App() {
       client={queryClient}
       persistOptions={{ persister: idbPersister, maxAge: 7 * 24 * 3600_000, buster: QUERY_CACHE_BUSTER }}
     >
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
         <Suspense fallback={<Splash />}>
           <Routes>
             <Route path="/welcome" element={<GuestOnly><Welcome /></GuestOnly>} />

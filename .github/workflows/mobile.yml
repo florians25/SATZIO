@@ -1,7 +1,7 @@
 # Baut die nativen Apps in der Cloud:
 #  - Android: Debug-APK (Artefakt "satzio-android-debug-apk")
 #  - iOS: unsignierter Simulator-Build mit Xcode (prüft, dass das Xcode-Projekt kompiliert)
-# Server-URL der App: Repository-Variable SATZIO_API_URL (Settings → Variables), sonst Platzhalter.
+# Server-URL der App: Repository-Variable SATZIO_API_URL (Settings → Variables), sonst https://satzio.netfusion-service.de.
 name: Mobile Apps
 
 on:
@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SATZIO_API_URL: ${{ vars.SATZIO_API_URL || 'https://satzio.example.com' }}
+  SATZIO_API_URL: ${{ vars.SATZIO_API_URL || 'https://satzio.netfusion-service.de' }}
 
 jobs:
   android:

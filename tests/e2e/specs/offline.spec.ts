@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { onboarding, register, uniqueUser, waitForSync } from './helpers';
+import { app } from './helpers';
 
 /**
  * Offline-First: Training läuft ohne Netz weiter, übersteht einen Neustart
@@ -48,7 +49,7 @@ test('Training offline fortsetzen, neu laden und synchronisieren', async ({ page
 });
 
 test('Fehlerhafte Eingaben und Netzwerkfehler beim Login', async ({ page, context }) => {
-  await page.goto('/login');
+  await page.goto(app('/login'));
   await page.getByRole('button', { name: 'Anmelden' }).click();
   await expect(page.getByText('Bitte E-Mail oder Benutzernamen eingeben.')).toBeVisible();
   await page.getByLabel('E-Mail oder Benutzername').fill('gibtsnicht');
@@ -59,7 +60,7 @@ test('Fehlerhafte Eingaben und Netzwerkfehler beim Login', async ({ page, contex
   await page.getByRole('button', { name: 'Anmelden' }).click();
   await expect(page.getByText('Keine Verbindung zum Server.')).toBeVisible();
   await context.setOffline(false);
-  await page.goto('/register');
+  await page.goto(app('/register'));
   await page.getByLabel('E-Mail-Adresse').fill('kaputt');
   await page.getByLabel('Benutzername').click();
   await expect(page.getByText('Bitte gib eine gültige E-Mail-Adresse ein.')).toBeVisible();

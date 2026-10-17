@@ -50,12 +50,12 @@ jobs:
       - name: Konfiguration erzeugen
         run: ./scripts/setup.sh
       - name: Images bauen
-        run: docker compose --profile website build
+        run: docker compose build
       - name: Stack starten & Healthcheck
         run: |
           docker compose up -d
           for i in $(seq 1 40); do curl -fsS http://localhost:8080/api/v1/health && break; sleep 3; done
-          curl -fsS http://localhost:8080/ | grep -q SATZIO
+          curl -fsS http://localhost:8080/ | grep -q SATZIO && curl -fsS http://localhost:8080/app/ | grep -q SATZIO
           docker compose ps
       - name: Logs bei Fehler
         if: failure()

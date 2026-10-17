@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { onboarding, register, uniqueUser, waitForSync } from './helpers';
+import { app } from './helpers';
 
 /**
  * Vollständiger Nutzer-Workflow (Abschnitt 34 der Anforderungen):
@@ -51,18 +52,18 @@ test('kompletter Trainingsablauf mit persistierten Daten', async ({ page }) => {
   await page.getByRole('button', { name: 'Fertig' }).click();
 
   // Historie
-  await page.goto('/history');
+  await page.goto(app('/history'));
   await expect(page.getByText('Push').first()).toBeVisible();
   await expect(page.getByText(/1 Sätze/)).toBeVisible();
 
   // Diagramme
-  await page.goto('/progress');
+  await page.goto(app('/progress'));
   await expect(page.getByText('Trainings', { exact: true }).first()).toBeVisible();
   await page.getByRole('tab', { name: 'Übungen' }).click();
   await expect(page.getByRole('img', { name: 'Gewichtsentwicklung' })).toBeVisible();
 
   // Logout
-  await page.goto('/profile');
+  await page.goto(app('/profile'));
   await page.getByRole('button', { name: 'Abmelden' }).click();
   await expect(page.getByText('Dein nächstes Level beginnt hier.')).toBeVisible();
 
@@ -74,13 +75,13 @@ test('kompletter Trainingsablauf mit persistierten Daten', async ({ page }) => {
   await expect(page.getByText(/Guten|Hallo|Gute Nacht/).first()).toBeVisible();
 
   // Persistierte Daten
-  await page.goto('/history');
+  await page.goto(app('/history'));
   await page.getByText('Push').first().click();
   await expect(page.getByLabel('Gewicht Satz 2 in kg').first()).toHaveValue('60');
   await expect(page.getByLabel('Wiederholungen Satz 2').first()).toHaveValue('12');
 
   // Smart Defaults: nächstes Training mit diesem Tag übernimmt die Werte
-  await page.goto('/plans');
+  await page.goto(app('/plans'));
   await page.getByText('Push / Pull / Legs').click();
   await page.getByRole('button', { name: 'Tagesoptionen' }).click();
   await page.getByText('Diesen Tag jetzt trainieren').click();

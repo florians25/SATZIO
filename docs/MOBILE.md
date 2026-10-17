@@ -22,8 +22,8 @@ Einschränkungen unter iOS (Plattform, nicht SATZIO): keine Vibrations-API; Web-
 
 ```bash
 cd apps/mobile
-SATZIO_API_URL=https://satzio.example.com pnpm run android:apk   # → dist/satzio-debug.apk
-SATZIO_API_URL=https://satzio.example.com pnpm run ios:sync && pnpm run ios:open   # Xcode (macOS)
+SATZIO_API_URL=https://satzio.netfusion-service.de pnpm run android:apk   # → dist/satzio-debug.apk
+SATZIO_API_URL=https://satzio.netfusion-service.de pnpm run ios:sync && pnpm run ios:open   # Xcode (macOS)
 ```
 
 **Cloud-Build:** Der GitHub-Workflow `.github/workflows/mobile.yml` baut bei jedem Push das Debug-APK (Artefakt `satzio-android-debug-apk`) und einen unsignierten iOS-Simulator-Build mit Xcode (Artefakt `satzio-ios-simulator-app`). Server-URL über die Repository-Variable `SATZIO_API_URL`.

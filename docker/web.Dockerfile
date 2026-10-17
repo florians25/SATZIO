@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# ───────────── SATZIO Web/PWA – Build mit Vite, Auslieferung mit nginx ─────────────
+# ───────────── SATZIO Web: Produktwebsite (/) + PWA (/app/) + API-Proxy (/api) ─────────────
 ARG NODE_IMAGE=node:24-alpine
 ARG NGINX_IMAGE=nginx:1.27-alpine
 
@@ -18,13 +18,17 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 COPY tsconfig.base.json ./
 COPY packages/shared packages/shared
 COPY apps/web apps/web
+# App unter /app/ – die Produktwebsite liegt unter /
+ENV VITE_BASE=/app/
 RUN pnpm --filter @satzio/web build
 
 FROM ${NGINX_IMAGE} AS runtime
 # Unprivilegierter Betrieb: Port 8080, temporäre Dateien unter /tmp
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY --from=build /repo/apps/web/dist /usr/share/nginx/html
-RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx
+COPY apps/website /usr/share/nginx/html
+COPY --from=build /repo/apps/web/dist /usr/share/nginx/html/app
+RUN rm -f /usr/share/nginx/html/preview-*.png /usr/share/nginx/html/README.md \
+ && chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx
 USER nginx
 EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=5 \
