@@ -72,8 +72,7 @@ if [[ "$PUBLIC_URL" == http://localhost* ]]; then
 fi
 if [ -z "$SMTP_HOST" ]; then
   yellow "• Kein SMTP konfiguriert: E-Mail-Bestätigung und Passwort-Reset per Mail sind deaktiviert."
-  yellow "  Training & Registrierung funktionieren trotzdem. Zum Testen: SMTP_HOST=mailpit, SMTP_PORT=1025 und"
-  yellow "  'docker compose --profile dev up -d --build' (Postfach: http://localhost:8025)."
+  yellow "  Training & Registrierung funktionieren trotzdem. SMTP kann später in .env eingetragen werden."
 fi
 
 # 5. Start vorbereiten

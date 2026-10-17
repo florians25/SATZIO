@@ -13,7 +13,8 @@
     "android:apk": "pnpm run build && cd android && ./gradlew assembleDebug && mkdir -p ../dist && cp app/build/outputs/apk/debug/app-debug.apk ../dist/satzio-debug.apk",
     "android:release": "pnpm run build && cd android && ./gradlew assembleRelease bundleRelease",
     "ios:open": "cap open ios",
-    "ios:sync": "pnpm run build && cap sync ios"
+    "ios:sync": "pnpm run build:web && cap sync ios && node scripts/vendor-ios.mjs",
+    "ios:vendor": "node scripts/vendor-ios.mjs"
   },
   "dependencies": {
     "@capacitor/android": "7.6.9",

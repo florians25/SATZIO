@@ -1,9 +1,8 @@
 # SATZIO – Self-Hosting mit einem Befehl:
 #   ./scripts/setup.sh          (einmalig: .env mit sicheren Secrets erzeugen)
 #   docker compose up -d --build
-# Optionaler Mail-Testdienst für die Entwicklung:
-#   docker compose --profile dev up -d --build   → Mailpit-Oberfläche auf :8025
-# Adressen: Website /  ·  Web-App /app/  ·  API /api/v1  (alles über den Web-Container)
+# Ein einziger Port (WEB_PORT, Standard 8080): Website /  ·  Web-App /app/  ·  API /api/v1
+# Datenbank und API sind nur intern erreichbar.
 
 name: satzio
 
@@ -81,14 +80,6 @@ services:
     tmpfs: [/tmp]
     security_opt: ['no-new-privileges:true']
     cap_drop: [ALL]
-
-  mailpit:
-    image: axllent/mailpit:v1.27
-    profiles: [dev]
-    restart: unless-stopped
-    ports:
-      - '127.0.0.1:${MAILPIT_PORT:-8025}:8025'
-    networks: [backend]
 
 volumes:
   pgdata:

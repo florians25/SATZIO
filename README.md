@@ -17,7 +17,7 @@ App öffnen → heutigen Plan sehen → Gewicht ggf. ändern → Satz abhaken �
 | Web-App / PWA | React 19, Vite, Tailwind CSS 4, Radix UI, TanStack Query, Zustand, Dexie (IndexedDB), Recharts, Motion |
 | API | NestJS 11, Prisma 6, PostgreSQL 16, OpenAPI/Swagger, JWT + rotierende Refresh-Tokens, Argon2id |
 | Mobil | Installierbare PWA (Android/iOS) · Capacitor-Projekte für Android und iOS (`apps/mobile`) |
-| Betrieb | Docker Compose: `postgres`, `api`, `web` (+ optional `website`, `mailpit`) |
+| Betrieb | Docker Compose: `postgres`, `api`, `web` – alles über **einen Port** (8080) |
 
 Screenshots: [`docs/screenshots`](docs/screenshots) · Produktwebsite: [`apps/website`](apps/website)
 
@@ -35,11 +35,12 @@ docker compose up -d --build  # baut und startet Datenbank, API und Web-App
 
 | Adresse | |
 |---|---|
-| **http://localhost:8080** | Web-App (Port per `WEB_PORT` in `.env`) |
+| **http://localhost:8080/** | Produktwebsite |
+| **http://localhost:8080/app/** | Web-App |
 | http://localhost:8080/api/docs | API-Dokumentation (Swagger) |
 | http://localhost:8080/api/v1/health | Healthcheck |
-| http://localhost:8090 | Produktwebsite (optional: `docker compose --profile website up -d --build`) |
-| http://localhost:8025 | Mail-Testpostfach (optional: `docker compose --profile dev up -d`, dazu `SMTP_HOST=mailpit`, `SMTP_PORT=1025`) |
+
+Alles läuft über **einen einzigen Port** (`WEB_PORT`, Standard 8080). Datenbank und API sind von außen nicht erreichbar.
 
 Beim Start wendet die API automatisch alle Datenbankmigrationen an und aktualisiert Übungsbibliothek und Achievements (idempotent – Nutzerdaten werden nie überschrieben). Es ist **keine manuelle Datenbankeinrichtung** und **kein manuell angelegter erster Benutzer** nötig: Ist `REGISTRATION_ENABLED=true`, registriert sich jeder direkt in der App.
 

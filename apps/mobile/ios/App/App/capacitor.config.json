@@ -1,0 +1,40 @@
+{
+	"appId": "de.satzio.app",
+	"appName": "SATZIO",
+	"webDir": "../web/dist",
+	"backgroundColor": "#0B0F0E",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"backgroundColor": "#0B0F0E",
+		"allowMixedContent": false
+	},
+	"ios": {
+		"backgroundColor": "#0B0F0E",
+		"contentInset": "never"
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 600,
+			"launchAutoHide": true,
+			"launchFadeOutDuration": 200,
+			"backgroundColor": "#0B0F0E",
+			"androidScaleType": "CENTER_CROP",
+			"showSpinner": false,
+			"splashFullScreen": false,
+			"splashImmersive": false
+		},
+		"StatusBar": {
+			"style": "DARK",
+			"backgroundColor": "#0B0F0E",
+			"overlaysWebView": false
+		}
+	},
+	"packageClassList": [
+		"HapticsPlugin",
+		"PreferencesPlugin",
+		"SplashScreenPlugin",
+		"StatusBarPlugin"
+	]
+}

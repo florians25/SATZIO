@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0B0F0E" />
+    <meta name="description" content="SATZIO – Trainieren. Abhaken. Stärker werden. Fitness-Tracking so einfach wie eine Notizen-App." />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SATZIO" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>SATZIO</title>
+    <script>
+      // Theme vor dem ersten Rendern setzen (kein Aufblitzen)
+      try {
+        var t = localStorage.getItem('satzio-theme') || 'dark';
+        if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="/assets/index-DAwc-4fk.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/data-CK6Tr_-o.js">
+    <link rel="modulepreload" crossorigin href="/assets/react-Bik-GMVl.js">
+    <link rel="modulepreload" crossorigin href="/assets/charts-ROIOCDrI.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-tg8PeAOD.css">
+  <link rel="manifest" href="/manifest.webmanifest"></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

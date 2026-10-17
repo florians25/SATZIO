@@ -67,7 +67,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Web-App bauen & in iOS-Projekt kopieren
         working-directory: apps/mobile
-        run: pnpm run build:web && npx cap sync ios
+        run: pnpm run ios:sync
       - name: Xcode-Build (Simulator)
         working-directory: apps/mobile/ios/App
         run: |

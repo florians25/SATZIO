@@ -222,35 +222,36 @@ Alternativ direkt bauen und starten: `npx cap run android` (im Ordner `apps/mobi
 
 ## 6. iOS: in Xcode öffnen, signieren, bauen
 
-Nur auf einem Mac:
+Das iOS-Projekt ist **eigenständig eingecheckt**: Web-App (`ios/App/App/public`,
+verbunden mit `https://satzio.netfusion-service.de`) und Capacitor-Plugins
+(`ios/App/CapApp-SPM/Plugins`) liegen im Repository. Auf dem Mac genügt:
+
+1. `apps/mobile/ios/App/App.xcodeproj` in Xcode öffnen.
+2. Warten, bis Xcode „Resolve Packages“ abgeschlossen hat (lädt nur
+   `capacitor-swift-pm` von GitHub). Bei Problemen: *File → Packages → Reset Package Caches*.
+3. Target **App** → *Signing & Capabilities*: „Automatically manage signing“,
+   eigenes **Team** wählen. Bundle-ID `de.satzio.app` ggf. anpassen
+   (dann auch `appId` in `capacitor.config.ts`).
+4. Gerät oder Simulator wählen → **Run** (⌘R).
+5. TestFlight/App Store: „Any iOS Device (arm64)“ → *Product → Archive* →
+   *Distribute App*. Vorher Version/Build-Nummer unter *General* erhöhen.
+
+**Fehler „Missing package product CapApp-SPM“** (ältere Stände): Das Projekt verwies
+auf Plugins in `node_modules`, die auf dem Mac ohne `pnpm install` fehlen. Lösung:
+aktuellen Stand holen – oder im Repo `pnpm install && pnpm --filter @satzio/mobile ios:sync`
+ausführen und danach *File → Packages → Reset Package Caches*.
+
+Web-App oder Server-URL geändert? Neu einbetten:
 
 ```bash
-pnpm install                                   # im Repo-Root
-cd apps/mobile
-SATZIO_API_URL=https://satzio.meine-domain.de pnpm run ios:sync   # Web-Build + cap sync ios
-pnpm run ios:open                              # = npx cap open ios → öffnet ios/App/App.xcodeproj
+pnpm install                                                # im Repo-Root
+SATZIO_API_URL=https://satzio.netfusion-service.de pnpm --filter @satzio/mobile ios:sync
+# = Web-Build + cap sync ios + Plugins ins Projekt kopieren (scripts/vendor-ios.mjs)
 ```
 
-In Xcode:
-
-1. Beim ersten Öffnen lädt Xcode die Swift-Pakete (`capacitor-swift-pm` von
-   GitHub sowie die Plugins aus `node_modules`). Abwarten, bis „Resolve Packages“
-   fertig ist (bei Problemen: *File → Packages → Reset Package Caches*).
-2. Target **App** → *Signing & Capabilities*: „Automatically manage signing“
-   aktivieren, das eigene **Team** (Apple-Developer-Account) wählen. Die Bundle-ID
-   ist `de.satzio.app`; falls sie im eigenen Account nicht verfügbar ist, eine
-   eigene ID eintragen (und dann auch `appId` in `capacitor.config.ts` anpassen).
-3. Gerät oder Simulator wählen → **Run** (⌘R).
-4. Für TestFlight/App Store: Ziel „Any iOS Device (arm64)“ → *Product → Archive* →
-   im Organizer *Distribute App* → App Store Connect.
-   Vorher Version/Build-Nummer im Target unter *General* erhöhen.
-
-> **Ehrlicher Hinweis:** Das iOS-Projekt wurde auf Linux generiert
-> (`npx cap add ios --packagemanager SPM` + `npx cap sync`), aber **nicht
-> kompiliert und nicht getestet**, da hier weder macOS noch Xcode verfügbar war.
-> Es handelt sich um das unveränderte Capacitor-7-Template plus generierte Icons/
-> Splash-Screens; Build-Fehler sind daher unwahrscheinlich, aber nicht
-> ausgeschlossen. Der erste Build auf einem Mac ist der eigentliche Test.
+> **Hinweis zum Test-Stand:** Das Projekt wird bei jedem Push in GitHub Actions auf
+> macOS mit Xcode für den Simulator gebaut (unsigniert). Signierte Builds und Tests
+> auf echten Geräten erfordern dein Apple-Developer-Konto und wurden nicht durchgeführt.
 
 ## Bekannte Einschränkungen
 

@@ -69,7 +69,7 @@ SMTP_PASSWORD=…
 MAIL_FROM="SATZIO <no-reply@example.com>"
 ```
 
-Ohne SMTP funktioniert SATZIO vollständig; nur E-Mails werden nicht versendet (Passwort-Reset dann nur über den Betreiber). Zum Testen: `docker compose --profile dev up -d` startet **Mailpit** (`SMTP_HOST=mailpit`, `SMTP_PORT=1025`, Postfach unter http://localhost:8025).
+Ohne SMTP funktioniert SATZIO vollständig; nur E-Mails werden nicht versendet (Passwort-Reset dann nur über den Betreiber).
 
 ## 4. Registrierung steuern
 
