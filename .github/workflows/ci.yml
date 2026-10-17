@@ -47,5 +47,16 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: Konfiguration erzeugen
+        run: ./scripts/setup.sh
       - name: Images bauen
-        run: docker compose build
+        run: docker compose --profile website build
+      - name: Stack starten & Healthcheck
+        run: |
+          docker compose up -d
+          for i in $(seq 1 40); do curl -fsS http://localhost:8080/api/v1/health && break; sleep 3; done
+          curl -fsS http://localhost:8080/ | grep -q SATZIO
+          docker compose ps
+      - name: Logs bei Fehler
+        if: failure()
+        run: docker compose logs --tail=200
