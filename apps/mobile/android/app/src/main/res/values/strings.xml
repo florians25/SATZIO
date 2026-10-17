@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SATZIO</string>
+    <string name="title_activity_main">SATZIO</string>
+    <string name="package_name">de.satzio.app</string>
+    <string name="custom_url_scheme">de.satzio.app</string>
+</resources>

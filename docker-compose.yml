@@ -1,0 +1,98 @@
+# SATZIO – Self-Hosting mit einem Befehl:
+#   ./scripts/setup.sh          (einmalig: .env mit sicheren Secrets erzeugen)
+#   docker compose up -d --build
+# Optionaler Mail-Testdienst für die Entwicklung:
+#   docker compose --profile dev up -d --build   → Mailpit-Oberfläche auf :8025
+
+name: satzio
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-satzio}
+      POSTGRES_USER: ${POSTGRES_USER:-satzio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD fehlt – bitte ./scripts/setup.sh ausführen}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Kein Port nach außen: Die Datenbank ist nur im internen Netzwerk erreichbar.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-satzio} -d ${POSTGRES_DB:-satzio}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [backend]
+    shm_size: 128mb
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    image: satzio/api:${SATZIO_VERSION:-latest}
+    init: true
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-satzio}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-satzio}?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET fehlt – bitte ./scripts/setup.sh ausführen}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-true}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-SATZIO <no-reply@satzio.local>}
+      MAIL_LOG_LINKS: ${MAIL_LOG_LINKS:-false}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-300}
+      AUTH_RATE_LIMIT_PER_MINUTE: ${AUTH_RATE_LIMIT_PER_MINUTE:-10}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-true}
+      TRUST_PROXY: 'true'
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+    networks: [backend, frontend]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ['no-new-privileges:true']
+    cap_drop: [ALL]
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    image: satzio/web:${SATZIO_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - '${WEB_BIND:-0.0.0.0}:${WEB_PORT:-8080}:8080'
+    networks: [frontend]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ['no-new-privileges:true']
+    cap_drop: [ALL]
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    profiles: [dev]
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${MAILPIT_PORT:-8025}:8025'
+    networks: [backend]
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  backend:
+  frontend:

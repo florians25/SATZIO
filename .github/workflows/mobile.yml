@@ -1,0 +1,82 @@
+# Baut die nativen Apps in der Cloud:
+#  - Android: Debug-APK (Artefakt "satzio-android-debug-apk")
+#  - iOS: unsignierter Simulator-Build mit Xcode (prüft, dass das Xcode-Projekt kompiliert)
+# Server-URL der App: Repository-Variable SATZIO_API_URL (Settings → Variables), sonst Platzhalter.
+name: Mobile Apps
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'apps/mobile/**'
+      - 'apps/web/**'
+      - 'packages/shared/**'
+      - '.github/workflows/mobile.yml'
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SATZIO_API_URL: ${{ vars.SATZIO_API_URL || 'https://satzio.example.com' }}
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: pnpm install --frozen-lockfile
+      - name: Web-App bauen & in Android-Projekt kopieren
+        working-directory: apps/mobile
+        run: pnpm run build
+      - name: Debug-APK bauen
+        working-directory: apps/mobile/android
+        run: ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: satzio-android-debug-apk
+          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  ios:
+    name: iOS (Xcode, Simulator, unsigniert)
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Web-App bauen & in iOS-Projekt kopieren
+        working-directory: apps/mobile
+        run: pnpm run build:web && npx cap sync ios
+      - name: Xcode-Build (Simulator)
+        working-directory: apps/mobile/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build
+      - name: App-Bundle packen
+        run: cd apps/mobile/ios/App/build/Build/Products/Debug-iphonesimulator && zip -qry "$GITHUB_WORKSPACE/satzio-ios-simulator.zip" App.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: satzio-ios-simulator-app
+          path: satzio-ios-simulator.zip

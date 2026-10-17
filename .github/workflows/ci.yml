@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: satzio
+          POSTGRES_PASSWORD: satzio
+          POSTGRES_DB: satzio_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U satzio" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://satzio:satzio@localhost:5432/satzio_test?schema=public
+      DATABASE_URL: postgresql://satzio:satzio@localhost:5432/satzio_test?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Shared – Unit-Tests & Build
+        run: pnpm --filter @satzio/shared test && pnpm --filter @satzio/shared build
+      - name: API – Typecheck & Integrationstests
+        run: pnpm --filter @satzio/api exec prisma generate && pnpm --filter @satzio/api typecheck && pnpm --filter @satzio/api test
+      - name: Web – Typecheck, Unit-Tests & Build
+        run: pnpm --filter @satzio/web typecheck && pnpm --filter @satzio/web test && pnpm --filter @satzio/web build
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Images bauen
+        run: docker compose build
