@@ -11,7 +11,7 @@
     "strictPropertyInitialization": false,
     "isolatedModules": false,
     "incremental": false,
-    "types": ["node"]
+    "types": ["node", "multer"]
   },
   "include": ["src", "prisma/*.ts", "test"]
 }

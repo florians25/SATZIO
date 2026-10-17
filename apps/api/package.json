@@ -28,6 +28,7 @@
     "@satzio/shared": "workspace:*",
     "argon2": "0.44.0",
     "cookie-parser": "1.4.7",
+    "express": "5.1.0",
     "helmet": "8.1.0",
     "nodemailer": "7.0.6",
     "reflect-metadata": "0.2.2",
@@ -47,6 +48,7 @@
     "@types/supertest": "6.0.3",
     "prisma": "6.16.2",
     "supertest": "7.1.4",
+    "tsx": "4.20.6",
     "typescript": "5.9.3",
     "unplugin-swc": "1.5.7",
     "vitest": "3.2.4"
