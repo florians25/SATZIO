@@ -24,7 +24,18 @@ export function useSetToggle() {
     if (settings.vibrationEnabled) vibrate(15);
     if (session.status === 'completed') return;
 
-    const ex = session.exercises.find((e) => e.id === exId)!;
+    // Notizen-Logik: leeres Gewicht im nächsten gleichartigen Satz mit dem gerade
+    // geschafften Wert vorbelegen (nur wenn dort noch nichts steht)
+    {
+      const cur = session.exercises.find((e) => e.id === exId)!;
+      const idx = cur.sets.findIndex((s) => s.id === setId);
+      const next = cur.sets.slice(idx + 1).find((s) => !s.completed && s.type === result.type);
+      if (next && next.weightKg === null && result.weightKg !== null) {
+        useWorkout.getState().updateSet(exId, next.id, { weightKg: result.weightKg, ...(next.reps === null && result.reps !== null ? { reps: result.reps } : {}) });
+      }
+    }
+
+    const ex = useWorkout.getState().session!.exercises.find((e) => e.id === exId)!;
     const all = session.exercises.flatMap((e) => e.sets);
     const total = all.length;
     const doneAfter = all.filter((s) => s.completed).length;

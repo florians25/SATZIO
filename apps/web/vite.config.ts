@@ -40,6 +40,8 @@ export default defineConfig({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
+        // Beim ersten Besuch sofort offline-fähig; Updates warten auf Bestätigung (kein Reload mitten im Training)
+        clientsClaim: true,
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         runtimeCaching: [
           {

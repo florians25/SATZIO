@@ -163,6 +163,7 @@ export class AnalyticsService {
       SELECT e."exerciseId", MAX(e."exerciseName") AS name, COUNT(DISTINCT ws.id) AS sessions, MAX(ws."startedAt") AS last
       FROM "WorkoutSessionExercise" e JOIN "WorkoutSession" ws ON ws.id = e."sessionId"
       WHERE ws."userId" = ${userId}::uuid AND ws.status = 'completed' AND e."exerciseId" IS NOT NULL
+        AND EXISTS (SELECT 1 FROM "WorkoutSet" s WHERE s."sessionExerciseId" = e.id AND s.completed)
       GROUP BY e."exerciseId" ORDER BY COUNT(DISTINCT ws.id) DESC, MAX(ws."startedAt") DESC`;
     return rows.map((r) => ({ exerciseId: r.exerciseId, name: r.name, sessions: Number(r.sessions), lastTrained: r.last.toISOString() }));
   }

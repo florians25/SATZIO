@@ -263,7 +263,10 @@ function DayCard({
           </span>
         )}
       </div>
-      <ul className="mt-4 divide-y divide-border">
+      <Button size="lg" block className="mt-4" onClick={onStart} loading={starting}>
+        <Play className="h-5 w-5" /> {done ? 'Nochmal trainieren' : startLabel}
+      </Button>
+      <ul className="mt-3 divide-y divide-border">
         {day.exercises.map((e) => {
           const pre = buildPrefilledSets({
             planned: e.sets,
@@ -292,9 +295,6 @@ function DayCard({
           Noch keine Übungen. <Link to={`/plans/${plan.id}`} className="text-primary">Plan bearbeiten</Link>
         </p>
       )}
-      <Button size="lg" block className="mt-3" onClick={onStart} loading={starting}>
-        <Play className="h-5 w-5" /> {done ? 'Nochmal trainieren' : startLabel}
-      </Button>
     </Card>
   );
 }

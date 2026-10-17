@@ -80,21 +80,24 @@ export const MuscleMap = memo(function MuscleMap({
   const p = new Set<MuscleGroup>(Array.isArray(primary) ? primary : primary ? [primary] : []);
   if (p.has('full_body')) ['chest', 'back', 'shoulders', 'quads', 'glutes', 'hamstrings', 'core', 'abs'].forEach((m) => p.add(m as MuscleGroup));
   const s = new Set<MuscleGroup>(secondary);
-  const showBack = [...p, ...s].some((m) => ['back', 'triceps', 'glutes', 'hamstrings'].includes(m));
-  const showFront = !compact || !showBack || [...p].some((m) => ['chest', 'abs', 'quads', 'biceps'].includes(m));
+  const backOnly: MuscleGroup[] = ['back', 'triceps', 'glutes', 'hamstrings'];
+  const frontOnly: MuscleGroup[] = ['chest', 'abs', 'quads', 'biceps'];
+  const prim = [...p];
+  // Kompakt: nur die Körperseite mit dem Hauptmuskel, formatfüllend
+  const compactSide: 'front' | 'back' = prim.some((m) => frontOnly.includes(m)) || !prim.some((m) => backOnly.includes(m)) ? 'front' : 'back';
+  if (compact) {
+    return (
+      <svg viewBox="16 3 56 106" className={cn('h-full w-full', className)} role="img" aria-label="Schematische Darstellung der beanspruchten Muskulatur (Platzhaltergrafik)">
+        <Body regions={compactSide === 'front' ? FRONT : BACK} primary={p} secondary={s} />
+      </svg>
+    );
+  }
   return (
-    <svg
-      viewBox={compact ? (showFront && showBack ? '0 0 176 112' : '0 0 88 112') : '0 0 176 112'}
-      className={cn('h-full w-full', className)}
-      role="img"
-      aria-label="Schematische Darstellung der beanspruchten Muskulatur (Platzhaltergrafik)"
-    >
-      {(showFront || !compact) && <Body regions={FRONT} primary={p} secondary={s} />}
-      {(showBack || !compact) && (
-        <g transform={compact && !showFront ? undefined : 'translate(88 0)'}>
-          <Body regions={BACK} primary={p} secondary={s} />
-        </g>
-      )}
+    <svg viewBox="0 0 176 112" className={cn('h-full w-full', className)} role="img" aria-label="Schematische Darstellung der beanspruchten Muskulatur (Platzhaltergrafik)">
+      <Body regions={FRONT} primary={p} secondary={s} />
+      <g transform="translate(88 0)">
+        <Body regions={BACK} primary={p} secondary={s} />
+      </g>
     </svg>
   );
 });

@@ -17,3 +17,5 @@ apps/mobile/android/app/build/
 apps/mobile/android/.gradle/
 apps/mobile/ios/App/Pods/
 apps/mobile/ios/App/build/
+tests/e2e/playwright-report/
+tests/e2e/test-results/
