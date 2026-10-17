@@ -337,3 +337,21 @@ export interface MuscleGroupStat {
   volumeKg: number;
   lastTrained: string | null;
 }
+
+export interface ExerciseListItem {
+  id: string;
+  slug: string;
+  nameDe: string;
+  nameEn: string | null;
+  aliases: string[];
+  primaryMuscle: MuscleGroup;
+  secondaryMuscles: MuscleGroup[];
+  equipment: Equipment;
+  category: ExerciseCategory;
+  difficulty: Difficulty;
+  weightStepKg: number | null;
+  isCustom: boolean;
+  isFavorite: boolean;
+  imageUrl: string | null;
+  userDefaults: { weightStepKg: number | null; defaultWeightKg: number | null; defaultReps: number | null; defaultRestSeconds: number | null } | null;
+}

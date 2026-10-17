@@ -1,0 +1,131 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+/* ───────────────────────── SATZIO Design-Tokens ───────────────────────── */
+:root,
+[data-theme='dark'] {
+  --bg: #0b0f0e;
+  --surface: #151b19;
+  --surface-2: #1c2421;
+  --surface-3: #24302b;
+  --border: #26302c;
+  --primary: #b7ff3c;
+  --primary-fg: #0b0f0e;
+  --text: #f5f7f5;
+  --muted: #9ba6a0;
+  --success: #45d483;
+  --warning: #ffb84d;
+  --error: #ff6262;
+  --ring: #b7ff3c;
+  --shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #f4f6f4;
+  --surface: #ffffff;
+  --surface-2: #eef1ee;
+  --surface-3: #e2e7e3;
+  --border: #dbe1dc;
+  --primary: #4f8a00;
+  --primary-fg: #ffffff;
+  --text: #0e1412;
+  --muted: #5c6a63;
+  --success: #1f9d57;
+  --warning: #b46b00;
+  --error: #d83a3a;
+  --ring: #4f8a00;
+  --shadow: 0 10px 30px rgb(15 30 20 / 0.12);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-ring: var(--ring);
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius-card: 1.25rem;
+  --shadow-float: var(--shadow);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--bg);
+  }
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  /* Kein Auto-Zoom auf iOS: Eingaben mindestens 16px */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 35%, transparent);
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-nav {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes satzio-pop {
+  0% { transform: scale(0.85); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.animate-pop {
+  animation: satzio-pop 220ms ease-out;
+}

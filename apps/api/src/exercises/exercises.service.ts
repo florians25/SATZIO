@@ -4,6 +4,7 @@ import {
   bestsFromRecords,
   type CustomExerciseInput,
   type ExercisePerformance,
+  type ExerciseListItem,
   type ExerciseView,
   type UserExerciseSettingsInput,
 } from '@satzio/shared';
@@ -21,23 +22,6 @@ const fullInclude = (userId: string) =>
 
 type FullExercise = Prisma.ExerciseGetPayload<{ include: ReturnType<typeof fullInclude> }>;
 
-export interface ExerciseListItem {
-  id: string;
-  slug: string;
-  nameDe: string;
-  nameEn: string | null;
-  aliases: string[];
-  primaryMuscle: ExerciseView['primaryMuscle'];
-  secondaryMuscles: ExerciseView['secondaryMuscles'];
-  equipment: ExerciseView['equipment'];
-  category: ExerciseView['category'];
-  difficulty: ExerciseView['difficulty'];
-  weightStepKg: number | null;
-  isCustom: boolean;
-  isFavorite: boolean;
-  imageUrl: string | null;
-}
-
 @Injectable()
 export class ExercisesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -49,6 +33,7 @@ export class ExercisesService {
       include: {
         muscles: { where: { role: 'secondary' } },
         favorites: { where: { userId }, select: { id: true } },
+        userExercises: { where: { userId } },
         media: {
           where: { isPlaceholder: false, OR: [{ uploadedById: null }, { uploadedById: userId }] },
           orderBy: { createdAt: 'desc' },
@@ -72,6 +57,14 @@ export class ExercisesService {
       isCustom: e.ownerId !== null,
       isFavorite: e.favorites.length > 0,
       imageUrl: e.media[0]?.url ?? null,
+      userDefaults: e.userExercises[0]
+        ? {
+            weightStepKg: num(e.userExercises[0].weightStepKg),
+            defaultWeightKg: num(e.userExercises[0].defaultWeightKg),
+            defaultReps: e.userExercises[0].defaultReps,
+            defaultRestSeconds: e.userExercises[0].defaultRestSeconds,
+          }
+        : null,
     }));
   }
 
