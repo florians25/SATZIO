@@ -18,7 +18,7 @@ while [ $# -gt 0 ]; do
     --no-backup) BACKUP=0 ;;
     --no-pull) PULL=0 ;;
     --branch) BRANCH="${2:?Branch-Name fehlt}"; shift ;;
-    -h|--help) sed -n '2,8p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,7p' "$0"; exit 0 ;;
     *) red "Unbekannte Option: $1"; exit 1 ;;
   esac
   shift
