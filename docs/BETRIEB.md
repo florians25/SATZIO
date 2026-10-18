@@ -111,6 +111,17 @@ Das Skript erstellt ein Backup, holt den neuen Stand (`git pull --ff-only`), bau
 
 Migrationen werden beim Start der API reproduzierbar angewendet (`prisma migrate deploy`). Clients erhalten neue Versionen über den Service Worker mit Hinweis „Neue Version verfügbar“ – es gibt **keinen automatischen Reload mitten im Training**. Lokale, noch nicht synchronisierte Änderungen bleiben in IndexedDB erhalten.
 
+### Fehler „P1000: Authentication failed against database server“
+
+Die API startet nicht und meldet in `docker compose logs api` den Fehler P1000. Dann passt das Datenbank-Passwort nicht zu `POSTGRES_PASSWORD` in `.env`. Das passiert, wenn `.env` neu erzeugt wurde (z. B. nach einem frischen Klon), das Datenbank-Volume aber noch aus der ersten Installation stammt – PostgreSQL übernimmt das Passwort nur beim allerersten Start. Lösung **ohne Datenverlust**:
+
+```bash
+./scripts/db-password-sync.sh      # setzt das DB-Passwort auf den Wert aus .env
+docker compose restart api
+```
+
+`./scripts/update.sh` führt diesen Abgleich bei jedem Update automatisch aus. **Nicht** `docker compose down -v` verwenden – das löscht alle Daten.
+
 ## 8. Monitoring & Logs
 
 ```bash

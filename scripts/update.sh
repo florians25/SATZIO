@@ -64,6 +64,7 @@ NEW_REV=$(git rev-parse --short HEAD 2>/dev/null || echo "unbekannt")
 echo "→ Images bauen …"
 docker compose build --pull
 echo "→ Neu starten …"
+./scripts/db-password-sync.sh
 docker compose up -d --remove-orphans
 
 # 4. Healthcheck
